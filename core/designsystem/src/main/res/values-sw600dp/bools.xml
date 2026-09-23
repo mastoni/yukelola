@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Tablet (sw >= 600dp) Flags -->
+    <bool name="is_tablet">true</bool>
+    <bool name="pos_two_pane_layout">true</bool>
+    <bool name="digital_two_pane_layout">true</bool>
+    <bool name="use_navigation_rail">true</bool>
+    <integer name="default_grid_columns">3</integer>
+    <integer name="form_columns">2</integer>
+</resources>

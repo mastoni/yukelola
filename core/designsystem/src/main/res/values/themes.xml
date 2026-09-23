@@ -1,0 +1,158 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base Application Theme -->
+    <style name="Theme.Yukelola" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Brand Colors -->
+        <item name="colorPrimary">@color/yukelola_navy</item>
+        <item name="colorOnPrimary">@color/yukelola_text_on_primary</item>
+        <item name="colorPrimaryContainer">@color/yukelola_cyan_light</item>
+        <item name="colorOnPrimaryContainer">@color/yukelola_navy</item>
+
+        <item name="colorSecondary">@color/yukelola_cyan</item>
+        <item name="colorOnSecondary">@color/yukelola_text_on_primary</item>
+        <item name="colorSecondaryContainer">@color/yukelola_cyan_light</item>
+        <item name="colorOnSecondaryContainer">@color/yukelola_navy_dark</item>
+
+        <item name="colorTertiary">@color/yukelola_yellow</item>
+        <item name="colorOnTertiary">@color/yukelola_text_on_yellow</item>
+        <item name="colorTertiaryContainer">@color/yukelola_yellow_light</item>
+        <item name="colorOnTertiaryContainer">@color/yukelola_navy_dark</item>
+
+        <!-- Semantic Error -->
+        <item name="colorError">@color/yukelola_semantic_error_red</item>
+        <item name="colorOnError">@color/yukelola_surface_white</item>
+        <item name="colorErrorContainer">@color/yukelola_semantic_error_red_light</item>
+        <item name="colorOnErrorContainer">@color/yukelola_semantic_error_red_dark</item>
+
+        <!-- Background and Surface -->
+        <item name="android:colorBackground">@color/yukelola_surface_light_neutral</item>
+        <item name="colorOnBackground">@color/yukelola_text_primary</item>
+        <item name="colorSurface">@color/yukelola_surface_white</item>
+        <item name="colorOnSurface">@color/yukelola_text_primary</item>
+        <item name="colorSurfaceVariant">@color/yukelola_surface_light_blue</item>
+        <item name="colorOnSurfaceVariant">@color/yukelola_text_secondary</item>
+        <item name="colorOutline">@color/yukelola_outline</item>
+
+        <!-- Typography Defaults -->
+        <item name="textAppearanceTitleLarge">@style/TextAppearance.Yukelola.Title</item>
+        <item name="textAppearanceBodyLarge">@style/TextAppearance.Yukelola.Body</item>
+        <item name="textAppearanceBodyMedium">@style/TextAppearance.Yukelola.Body.Medium</item>
+        <item name="textAppearanceLabelLarge">@style/TextAppearance.Yukelola.Button</item>
+    </style>
+
+    <!-- Typography Styles -->
+    <style name="TextAppearance.Yukelola.Display" parent="TextAppearance.Material3.DisplayMedium">
+        <item name="android:textSize">@dimen/text_size_display</item>
+        <item name="android:textColor">@color/yukelola_text_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Yukelola.Headline" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textSize">@dimen/text_size_headline</item>
+        <item name="android:textColor">@color/yukelola_text_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Yukelola.Title" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">@dimen/text_size_title</item>
+        <item name="android:textColor">@color/yukelola_text_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Yukelola.Subheading" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">@dimen/text_size_subheading</item>
+        <item name="android:textColor">@color/yukelola_text_primary</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Yukelola.Body" parent="TextAppearance.Material3.BodyLarge">
+        <item name="android:textSize">@dimen/text_size_body</item>
+        <item name="android:textColor">@color/yukelola_text_primary</item>
+    </style>
+
+    <style name="TextAppearance.Yukelola.Body.Medium" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">@dimen/text_size_sm</item>
+        <item name="android:textColor">@color/yukelola_text_secondary</item>
+    </style>
+
+    <style name="TextAppearance.Yukelola.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">@dimen/text_size_caption</item>
+        <item name="android:textColor">@color/yukelola_text_muted</item>
+    </style>
+
+    <style name="TextAppearance.Yukelola.Button" parent="TextAppearance.Material3.LabelLarge">
+        <item name="android:textSize">@dimen/text_size_body</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.Yukelola.Currency" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:textSize">@dimen/text_size_currency_large</item>
+        <item name="android:textColor">@color/yukelola_navy</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:fontFamily">sans-serif-medium</item>
+    </style>
+
+    <!-- Component Widget Styles -->
+    <!-- Primary CTA (Yukelola Cyan) -->
+    <style name="Widget.Yukelola.Button.Primary" parent="Widget.Material3.Button">
+        <item name="android:minHeight">@dimen/button_height_md</item>
+        <item name="backgroundTint">@color/yukelola_cyan</item>
+        <item name="android:textColor">@color/yukelola_text_on_primary</item>
+        <item name="cornerRadius">@dimen/radius_md</item>
+        <item name="android:textAppearance">@style/TextAppearance.Yukelola.Button</item>
+    </style>
+
+    <!-- Secondary CTA (Yukelola Navy) -->
+    <style name="Widget.Yukelola.Button.Secondary" parent="Widget.Material3.Button">
+        <item name="android:minHeight">@dimen/button_height_md</item>
+        <item name="backgroundTint">@color/yukelola_navy</item>
+        <item name="android:textColor">@color/yukelola_text_on_primary</item>
+        <item name="cornerRadius">@dimen/radius_md</item>
+        <item name="android:textAppearance">@style/TextAppearance.Yukelola.Button</item>
+    </style>
+
+    <!-- Yellow Accent Button (Cash / Attention) -->
+    <style name="Widget.Yukelola.Button.Yellow" parent="Widget.Material3.Button">
+        <item name="android:minHeight">@dimen/button_height_md</item>
+        <item name="backgroundTint">@color/yukelola_yellow</item>
+        <item name="android:textColor">@color/yukelola_text_on_yellow</item>
+        <item name="cornerRadius">@dimen/radius_md</item>
+        <item name="android:textAppearance">@style/TextAppearance.Yukelola.Button</item>
+    </style>
+
+    <!-- Outlined Button -->
+    <style name="Widget.Yukelola.Button.Outlined" parent="Widget.Material3.Button.OutlinedButton">
+        <item name="android:minHeight">@dimen/button_height_md</item>
+        <item name="android:textColor">@color/yukelola_navy</item>
+        <item name="strokeColor">@color/yukelola_outline</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cornerRadius">@dimen/radius_md</item>
+        <item name="android:textAppearance">@style/TextAppearance.Yukelola.Button</item>
+    </style>
+
+    <!-- Rounded Card -->
+    <style name="Widget.Yukelola.Card" parent="Widget.Material3.CardView.Filled">
+        <item name="cardBackgroundColor">@color/yukelola_surface_white</item>
+        <item name="cardCornerRadius">@dimen/radius_lg</item>
+        <item name="cardElevation">@dimen/elevation_card</item>
+        <item name="strokeWidth">0dp</item>
+    </style>
+
+    <style name="Widget.Yukelola.Card.Outlined" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardBackgroundColor">@color/yukelola_surface_white</item>
+        <item name="cardCornerRadius">@dimen/radius_lg</item>
+        <item name="strokeColor">@color/yukelola_divider</item>
+        <item name="strokeWidth">1dp</item>
+        <item name="cardElevation">@dimen/elevation_none</item>
+    </style>
+
+    <!-- Input Text Fields -->
+    <style name="Widget.Yukelola.TextInputLayout" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="boxCornerRadiusTopStart">@dimen/radius_md</item>
+        <item name="boxCornerRadiusTopEnd">@dimen/radius_md</item>
+        <item name="boxCornerRadiusBottomStart">@dimen/radius_md</item>
+        <item name="boxCornerRadiusBottomEnd">@dimen/radius_md</item>
+        <item name="boxStrokeColor">@color/yukelola_cyan</item>
+        <item name="hintTextColor">@color/yukelola_text_secondary</item>
+    </style>
+</resources>

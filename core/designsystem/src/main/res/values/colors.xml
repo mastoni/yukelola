@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Primary Brand Colors -->
+    <color name="yukelola_navy">#0A2540</color>
+    <color name="yukelola_navy_dark">#071A2E</color>
+    <color name="yukelola_navy_light">#163E66</color>
+    
+    <color name="yukelola_cyan">#00A3FF</color>
+    <color name="yukelola_cyan_dark">#0082CC</color>
+    <color name="yukelola_cyan_light">#E5F6FF</color>
+    
+    <color name="yukelola_yellow">#FFB800</color>
+    <color name="yukelola_yellow_dark">#CC9300</color>
+    <color name="yukelola_yellow_light">#FFF8E5</color>
+
+    <!-- Semantic Colors (Meaning-Driven) -->
+    <!-- Sales / Success Green -->
+    <color name="yukelola_semantic_sales_green">#00C853</color>
+    <color name="yukelola_semantic_sales_green_dark">#009624</color>
+    <color name="yukelola_semantic_sales_green_light">#E8F5E9</color>
+
+    <!-- Digital / Information Blue -->
+    <color name="yukelola_semantic_digital_blue">#2979FF</color>
+    <color name="yukelola_semantic_digital_blue_dark">#1565C0</color>
+    <color name="yukelola_semantic_digital_blue_light">#E3F2FD</color>
+
+    <!-- Return / Error / Attention Red -->
+    <color name="yukelola_semantic_error_red">#D50000</color>
+    <color name="yukelola_semantic_error_red_dark">#9B0000</color>
+    <color name="yukelola_semantic_error_red_light">#FFEBEE</color>
+
+    <!-- Inventory / Operational Orange -->
+    <color name="yukelola_semantic_inventory_orange">#FF6D00</color>
+    <color name="yukelola_semantic_inventory_orange_dark">#C43E00</color>
+    <color name="yukelola_semantic_inventory_orange_light">#FFF3E0</color>
+
+    <!-- Reports / Analytics Purple -->
+    <color name="yukelola_semantic_reports_purple">#7C4DFF</color>
+    <color name="yukelola_semantic_reports_purple_dark">#512DA8</color>
+    <color name="yukelola_semantic_reports_purple_light">#EDE7F6</color>
+
+    <!-- Surface & Backgrounds -->
+    <color name="yukelola_surface_white">#FFFFFF</color>
+    <color name="yukelola_surface_light_blue">#F4F8FC</color>
+    <color name="yukelola_surface_light_neutral">#F8FAFC</color>
+    <color name="yukelola_surface_dark_navy">#0A192F</color>
+    <color name="yukelola_surface_overlay">#800A2540</color>
+
+    <!-- Borders & Dividers -->
+    <color name="yukelola_divider">#E2E8F0</color>
+    <color name="yukelola_outline">#CBD5E1</color>
+    <color name="yukelola_outline_focused">#00A3FF</color>
+
+    <!-- Text & Typography Colors -->
+    <color name="yukelola_text_primary">#0F172A</color>
+    <color name="yukelola_text_secondary">#64748B</color>
+    <color name="yukelola_text_muted">#94A3B8</color>
+    <color name="yukelola_text_on_dark">#FFFFFF</color>
+    <color name="yukelola_text_on_primary">#FFFFFF</color>
+    <color name="yukelola_text_on_yellow">#071A2E</color>
+    <color name="yukelola_text_disabled">#A0AEC0</color>
+</resources>

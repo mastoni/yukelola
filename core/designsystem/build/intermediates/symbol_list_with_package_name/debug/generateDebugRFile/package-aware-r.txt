@@ -1,1 +1,0 @@
-id.yukelola.core.designsystem

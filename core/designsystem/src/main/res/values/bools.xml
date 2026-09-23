@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Default Compact Screen (Phone) Flags -->
+    <bool name="is_tablet">false</bool>
+    <bool name="pos_two_pane_layout">false</bool>
+    <bool name="digital_two_pane_layout">false</bool>
+    <bool name="use_navigation_rail">false</bool>
+    <integer name="default_grid_columns">2</integer>
+    <integer name="form_columns">1</integer>
+</resources>
