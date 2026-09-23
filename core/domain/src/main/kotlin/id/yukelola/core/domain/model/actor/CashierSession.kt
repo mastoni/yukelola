@@ -30,4 +30,18 @@ data class CashierSession(
      */
     val isOpen: Boolean
         get() = status == SessionStatus.OPEN
+
+    /**
+     * Closes this shift session with a recorded closing balance and timestamp.
+     */
+    fun close(closingBalance: Long, closedAt: Long): CashierSession {
+        require(isOpen) { "Cannot close an already closed shift session" }
+        require(closedAt >= openedAt) { "closedAt must not be earlier than openedAt" }
+        require(closingBalance >= 0L) { "closingBalance must not be negative" }
+        return copy(
+            closingBalance = closingBalance,
+            closedAt = closedAt,
+            status = SessionStatus.CLOSED
+        )
+    }
 }

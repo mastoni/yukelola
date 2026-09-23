@@ -25,4 +25,14 @@ data class Branch(
      * Checks if a specific capability is enabled for this branch.
      */
     fun hasCapability(capability: Capability): Boolean = enabledCapabilities.contains(capability)
+
+    /**
+     * Produces a branch copy with an enabled capability added.
+     */
+    fun withCapability(capability: Capability): Branch = copy(enabledCapabilities = enabledCapabilities + capability)
+
+    /**
+     * Produces a branch copy with a capability removed.
+     */
+    fun withoutCapability(capability: Capability): Branch = copy(enabledCapabilities = enabledCapabilities - capability)
 }
