@@ -3,6 +3,8 @@ package id.yukelola.core.domain.model.catalog
 /**
  * Branch-specific operational product state and pricing ledger.
  * Governs local on-hand inventory, reorder thresholds, and localized price overrides for a Branch.
+ *
+ * Invariant: Stock, local pricing, and availability belong strictly to the Branch context.
  */
 data class BranchProductOverride(
     val branchId: String,
@@ -36,4 +38,20 @@ data class BranchProductOverride(
      */
     val isLowStock: Boolean
         get() = stock <= minStock
+
+    /**
+     * Produces a branch product override with updated stock count (immutable copy).
+     */
+    fun withStock(newStock: Double): BranchProductOverride = copy(stock = newStock)
+
+    /**
+     * Produces a branch product override with updated local pricing.
+     */
+    fun withPricing(localSellingPrice: Long?, localCostPrice: Long?): BranchProductOverride =
+        copy(localSellingPrice = localSellingPrice, localCostPrice = localCostPrice)
+
+    /**
+     * Produces a branch product override with updated availability.
+     */
+    fun withAvailability(isAvailable: Boolean): BranchProductOverride = copy(isAvailable = isAvailable)
 }
