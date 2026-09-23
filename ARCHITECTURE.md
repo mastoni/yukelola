@@ -37,7 +37,7 @@ yukelola
 
 - Core: `id.yukelola.core.*`
 - Feature: `id.yukelola.feature.*`
-- App: `com.skmnetwork.yukelola` (existing, to be migrated)
+- App: `id.yukelola`
 
 ## Dependency Direction
 

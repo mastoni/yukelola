@@ -1,4 +1,4 @@
-package com.skmnetwork.yukelola
+package id.yukelola
 
 import org.junit.Test
 

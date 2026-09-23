@@ -29,7 +29,7 @@
 
 | Module | Package | Type | Responsibility |
 |--------|---------|------|----------------|
-| `:app` | `com.skmnetwork.yukelola` | Android Application | App entry point, navigation graph, DI setup |
+| `:app` | `id.yukelola` | Android Application | App entry point, navigation graph, DI setup |
 
 ## Dependency Rules
 

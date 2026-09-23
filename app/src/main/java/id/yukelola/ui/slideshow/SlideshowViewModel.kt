@@ -1,4 +1,4 @@
-package com.skmnetwork.yukelola.ui.slideshow
+package id.yukelola.ui.slideshow
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

@@ -1,4 +1,4 @@
-package com.skmnetwork.yukelola.ui.transform
+package id.yukelola.ui.transform
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -12,9 +12,9 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.skmnetwork.yukelola.R
-import com.skmnetwork.yukelola.databinding.FragmentTransformBinding
-import com.skmnetwork.yukelola.databinding.ItemTransformBinding
+import id.yukelola.R
+import id.yukelola.databinding.FragmentTransformBinding
+import id.yukelola.databinding.ItemTransformBinding
 
 /**
  * Fragment that demonstrates a responsive layout pattern where the format of the content

@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "com.skmnetwork.yukelola"
+    namespace = "id.yukelola"
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.skmnetwork.yukelola"
+        applicationId = "id.yukelola"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
