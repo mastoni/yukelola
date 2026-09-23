@@ -2,8 +2,13 @@ package id.yukelola.core.domain.model.digital
 
 import id.yukelola.core.domain.model.attribution.TransactionAttribution
 import id.yukelola.core.domain.model.cash.CashRegister
+import id.yukelola.core.domain.model.debt.CustomerDebt
+import id.yukelola.core.domain.model.debt.DebtReferenceType
+import id.yukelola.core.domain.model.sale.Sale
+import id.yukelola.core.domain.model.sale.TransactionMode
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotSame
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -60,13 +65,33 @@ class DigitalTransactionComplaintTest {
             createdAt = 1200L
         )
 
+        // Mismatched branch
         assertThrows(IllegalArgumentException::class.java) {
             DigitalTransactionComplaint.createForTransaction(
-                id = "comp-cross",
+                id = "comp-cross-branch",
                 transaction = digitalTx, // Branch A
                 attribution = attributionBranchB, // Branch B
                 reason = DigitalTransactionComplaintReason.PRODUCT_NOT_RECEIVED,
                 description = "Cross branch attempt"
+            )
+        }
+
+        val attributionOtherBusiness = TransactionAttribution(
+            businessId = "biz-other",
+            branchId = "branch-a",
+            userId = "user-03",
+            deviceId = "dev-03",
+            createdAt = 1200L
+        )
+
+        // Mismatched business
+        assertThrows(IllegalArgumentException::class.java) {
+            DigitalTransactionComplaint.createForTransaction(
+                id = "comp-cross-biz",
+                transaction = digitalTx,
+                attribution = attributionOtherBusiness,
+                reason = DigitalTransactionComplaintReason.PRODUCT_NOT_RECEIVED,
+                description = "Cross business attempt"
             )
         }
     }
@@ -102,7 +127,7 @@ class DigitalTransactionComplaintTest {
     }
 
     @Test
-    fun `complaint executes rejection path INVESTIGATING to REJECTED`() {
+    fun `complaint executes rejection path INVESTIGATING to REJECTED and OPEN to REJECTED`() {
         val complaint = DigitalTransactionComplaint.createForTransaction(
             id = "comp-02",
             transaction = digitalTx,
@@ -113,13 +138,37 @@ class DigitalTransactionComplaintTest {
         )
 
         val investigating = complaint.markInvestigating(1250L)
-        val rejected = investigating.markRejected(
+        val rejectedFromInvestigating = investigating.markRejected(
             rejectionReason = "Destination number was input correctly by customer; transaction successfully fulfilled.",
             timestamp = 1300L
         )
 
-        assertEquals(DigitalTransactionComplaintStatus.REJECTED, rejected.status)
-        assertTrue(rejected.isTerminal)
+        assertEquals(DigitalTransactionComplaintStatus.REJECTED, rejectedFromInvestigating.status)
+        assertTrue(rejectedFromInvestigating.isTerminal)
+
+        val directRejection = complaint.markRejected(
+            rejectionReason = "Duplicate invalid report",
+            timestamp = 1250L
+        )
+        assertEquals(DigitalTransactionComplaintStatus.REJECTED, directRejection.status)
+        assertTrue(directRejection.isTerminal)
+    }
+
+    @Test
+    fun `invalid complaint transition is strictly rejected`() {
+        val openComplaint = DigitalTransactionComplaint.createForTransaction(
+            id = "comp-03",
+            transaction = digitalTx,
+            attribution = attributionBranchA,
+            reason = DigitalTransactionComplaintReason.WRONG_RESULT,
+            description = "Wrong result",
+            createdAt = 1200L
+        )
+
+        // Cannot jump directly from OPEN to RESOLVED without investigation
+        assertThrows(IllegalArgumentException::class.java) {
+            openComplaint.markResolved("Direct resolve", 1250L)
+        }
     }
 
     @Test
@@ -189,5 +238,21 @@ class DigitalTransactionComplaintTest {
 
         // 3. DigitalDepositAccount is untouched
         assertEquals(500000L, depositAccount.currentBalance)
+    }
+
+    @Test
+    fun `complaint does NOT create debt, sale, or inquiry`() {
+        val complaint = DigitalTransactionComplaint.createForTransaction(
+            id = "comp-04",
+            transaction = digitalTx,
+            attribution = attributionBranchA,
+            reason = DigitalTransactionComplaintReason.CUSTOMER_DISPUTE,
+            description = "Customer claims disputed charge",
+            createdAt = 1200L
+        )
+
+        // Complaint is strictly a complaint record and does not instantiate a Sale, Debt, or Inquiry
+        assertFalse(complaint.isTerminal)
+        assertEquals("comp-04", complaint.id)
     }
 }
