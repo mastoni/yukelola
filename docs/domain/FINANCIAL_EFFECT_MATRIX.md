@@ -1,13 +1,13 @@
 # Financial Effect Matrix
 
-> **Document Status:** CANONICAL REFERENCE  
+> **Document Status:** CANONICAL REFERENCE (REVISION: RETAIL_HEALTH / APOTEK + TOKO OBAT)  
 > **Target Scope:** Financial ledgers, monetary mutations, gross profit recognition, and balance invariants across all business models.
 
 ---
 
 ## 1. Core Financial Ledger Separation
 
-Yukelola enforces strict separation between four distinct financial categories:
+Yukelola enforces strict separation between distinct financial categories:
 
 $$\mathbf{CashRegister} \ne \mathbf{DigitalDepositAccount} \ne \mathbf{CustomerDebt} \ne \mathbf{SupplierDebt}$$
 
@@ -16,9 +16,9 @@ $$\mathbf{Deposit\ Top\text{-}Up} \ne \mathbf{Revenue}$$
 
 ---
 
-## 2. Financial Effect Matrix by Business Model
+## 2. Financial Effect Matrix by Business Context
 
-| Business Model | Transaction Event | CashRegister Effect | DigitalDeposit Effect | Customer Debt Effect | Supplier Debt Effect | Revenue & Profit Recognition |
+| Business Context | Transaction Event | CashRegister Effect | DigitalDeposit Effect | Customer Debt Effect | Supplier Debt Effect | Revenue & Profit Recognition |
 |---|---|---|---|---|---|---|
 | **RETAIL_WARUNG** | Cash Retail Sale | $+\text{Paid Amount}$ | Untouched | None | None | $\text{Revenue} = \text{Total}$; $\text{Profit} = \text{Subtotal} - \text{COGS}$ |
 | | Credit Sale (Kasbon) | $+0$ (or partial) | Untouched | $+\text{Unpaid Balance}$ | None | $\text{Revenue} = \text{Total}$; Cash realized upon debt repayment |
@@ -27,12 +27,16 @@ $$\mathbf{Deposit\ Top\text{-}Up} \ne \mathbf{Revenue}$$
 | **DIGITAL_KIOSK / KONTER**| Deposit Top-Up (via Cash) | $-\text{TopUp Amount}$ | $+\text{TopUp Amount}$ | None | None | **Capital Transfer (Zero Revenue, Zero Profit)** |
 | | Digital Product Sale (Cash)| $+\text{Selling Price}$ | $-\text{Cost Price}$ | None | None | $\text{Gross Profit} = \text{Selling Price} - \text{Cost Price}$ |
 | | Digital Transaction Failed | $+0$ (or cash refund) | $+\text{Cost Price (Refund)}$| None | None | Reversal/Refund mutation; zero net profit |
-| **LAUNDRY** | Order Intake + Down Payment | $+\text{Down Payment}$ | Untouched | Tracked on Order | None | Revenue realized on order; Cash increases by DP |
+| **RETAIL_HEALTH (APOTEK / TOKO OBAT)** | Cash/QRIS Medicine Sale | $+\text{Paid Amount}$ | Untouched | None | None | $\text{Revenue} = \text{Total}$; $\text{Profit} = \text{Selling Price} - \text{Unit COGS}$ |
+| | Patient Credit / Kasbon | $+0$ (or partial) | Untouched | $+\text{Unpaid Balance}$ | None | $\text{Revenue} = \text{Total}$; Debt ledger updated |
+| | PBF Supplier Purchase | $-\text{Cash Paid}$ / $0$ (tempo) | Untouched | None | $+\text{Tempo Payable}$ | Inventory asset increases; payable settled on tempo date |
+| **LAUNDRY** | Order Intake + Down Payment | $+\text{Down Payment}$ | Untouched | Tracked on Order | None | Down payment recorded as liability / cash in; realized on fulfillment |
 | | Order Pickup & Full Pay | $+\text{Remaining Balance}$| Untouched | Order Settled | None | Total Cash In = Total Order Price |
-| **SERVICE_WORKSHOP** | Spare Part + Labor Order | $+\text{Payment Amount}$ | Untouched | Optional Debt | None | $\text{Labor Fee} + (\text{Parts Price} - \text{Parts Cost})$ |
-| **PERCETAKAN** | Print Job + Down Payment | $+\text{Down Payment}$ | Untouched | Tracked on Order | None | Material Cost + Finishing Margin |
+| **SERVICE_WORKSHOP** | Spare Part + Labor Order | $+\text{Payment Amount}$ | Untouched | Optional Debt | None | $\text{Labor Revenue} + (\text{Parts Price} - \text{Parts Cost})$ |
+| **PERCETAKAN** | Print Job + Down Payment | $+\text{Down Payment}$ | Untouched | Tracked on Order | None | Material Cost + Custom Finishing Margin |
 | **FOTOCOPY** | Per-Page Instant Sale | $+\text{Cash Collected}$| Untouched | None | None | $\text{Pages} \times (\text{Unit Price} - \text{Paper Cost})$ |
-| **APOTEK / ATK** | Barcode Retail Sale | $+\text{Cash Collected}$| Untouched | Optional Debt | None | Standard Retail Gross Margin |
+| **ATK (Stationery)** | Barcode Retail Sale | $+\text{Cash Collected}$| Untouched | Optional Debt | None | Standard Multi-Unit Retail Gross Margin |
+| **GENERAL_STORE** | Multi-Category Sale | $+\text{Cash Collected}$| Untouched | Optional Debt | None | Standard Consolidated Gross Margin |
 
 ---
 

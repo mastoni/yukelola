@@ -1,6 +1,6 @@
 # Transaction Mode Matrix
 
-> **Document Status:** CANONICAL REFERENCE  
+> **Document Status:** CANONICAL REFERENCE (REVISION: RETAIL_HEALTH / APOTEK + TOKO OBAT)  
 > **Target Scope:** Formal specification of transaction modes, settlement mechanics, and fulfillment rules in Yukelola.
 
 ---
@@ -27,9 +27,9 @@ Yukelola defines three distinct transaction modes to govern validation, inventor
 
 | Attribute | `RETAIL_TRANSACTION` | `DIGITAL_TRANSACTION` | `SERVICE_ORDER_TRANSACTION` |
 |---|---|---|---|
-| **Primary Business Models** | `RETAIL_WARUNG`, `ATK`, `APOTEK`, `GENERAL_STORE`, `F&B CAFE`, `FOTOCOPY` (instant) | `DIGITAL_KIOSK` / `KONTER`, `WARUNG + DIGITAL` | `LAUNDRY`, `SERVICE_WORKSHOP`, `PERCETAKAN`, `FOTOCOPY` (bulk) |
+| **Primary Business Contexts** | `RETAIL_WARUNG`, `WARUNG + OBAT`, `ATK`, `RETAIL_HEALTH` (`APOTEK` / `TOKO_OBAT`), `GENERAL_STORE`, `F&B CAFE`, `FOTOCOPY` (instant) | `DIGITAL_KIOSK` / `KONTER`, `WARUNG + DIGITAL` | `LAUNDRY`, `SERVICE_WORKSHOP`, `PERCETAKAN`, `FOTOCOPY` (bulk) |
 | **Operational Execution** | Synchronous (Instant) | Synchronous / Electronic Dispatch | Asynchronous (Multi-step queue) |
-| **Catalog Input** | Barcode scan, catalog grid, quick items | Target number (Phone/IDPEL), denomination picker | Service specs (Weight/Unit/Job size), vehicle plate, file ref |
+| **Catalog Input** | Barcode scan, catalog grid, quick items, multi-unit drug selector | Target number (Phone/IDPEL), denomination picker | Service specs (Weight/Unit/Job size), vehicle plate, file ref |
 | **Fulfillment State** | `COMPLETED` immediately upon payment | `INITIATED` $\rightarrow$ `PENDING` $\rightarrow$ `SUCCESS` / `FAILED` | `RECEIVED` $\rightarrow$ `IN_PROGRESS` $\rightarrow$ `READY` $\rightarrow$ `COMPLETED` |
 | **Physical Inventory Effect** | Decrements `Product.stock` for `PHYSICAL` goods | **None** (Digital products do not use warehouse stock) | Decrements stock for physical materials/spare parts consumed |
 | **Cash Drawer Effect** | Increases `CashRegister` by cash paid | Increases `CashRegister` by selling price (if paid cash) | Increases `CashRegister` on down payment and final pickup payment |
