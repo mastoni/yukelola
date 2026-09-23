@@ -10,7 +10,8 @@ data class BusinessProfile(
     val receiptHeader: String? = null,
     val receiptFooter: String? = null,
     val currency: String = "IDR",
-    val timezone: String = "Asia/Jakarta"
+    val timezone: String = "Asia/Jakarta",
+    val allowNegativeStock: Boolean = false
 ) {
     init {
         require(name.isNotBlank()) { "BusinessProfile name must not be blank" }

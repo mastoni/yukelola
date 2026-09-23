@@ -41,8 +41,25 @@ data class BranchProductOverride(
 
     /**
      * Produces a branch product override with updated stock count (immutable copy).
+     * Rejects negative stock if allowNegativeStock is false.
      */
-    fun withStock(newStock: Double): BranchProductOverride = copy(stock = newStock)
+    fun withStock(newStock: Double, allowNegativeStock: Boolean = false): BranchProductOverride {
+        if (!allowNegativeStock) {
+            require(newStock >= 0.0) {
+                "Stock quantity cannot be negative ($newStock) when allowNegativeStock is false"
+            }
+        }
+        return copy(stock = newStock)
+    }
+
+    /**
+     * Produces a branch product override with stock adjusted by delta.
+     * Rejects negative stock if allowNegativeStock is false.
+     */
+    fun withStockDelta(delta: Double, allowNegativeStock: Boolean = false): BranchProductOverride {
+        val newStock = stock + delta
+        return withStock(newStock, allowNegativeStock)
+    }
 
     /**
      * Produces a branch product override with updated local pricing.
