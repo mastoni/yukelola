@@ -1,10 +1,10 @@
 # Yukelola Product & Domain Contract
 
-> **Contract Version:** 1.2.0  
-> **Status:** LOCKED / CANONICAL SOURCE OF TRUTH  
-> **Canonical Identity:** `id.yukelola`  
-> **Target Scope:** Android Modular Monolith Core Domain (`:core:domain`), Room Database Entities (`:core:database`), Repository Contracts, UseCases, Multi-Branch Local-First Architecture, and Future Backend/PPOB Boundaries.  
-> **Consolidated Sources:** Product Contract v1.1.0, YK-DOMAIN-03 Domain Logic Matrix, and YK-DOMAIN-04 Multi-Branch Architecture.
+> **Contract Version:** 1.3.0
+> **Status:** LOCKED / CANONICAL SOURCE OF TRUTH
+> **Canonical Identity:** `id.yukelola`
+> **Target Scope:** Android Modular Monolith Core Domain (`:core:domain`), Room Database Entities (`:core:database`), Repository Contracts, UseCases, Multi-Branch Local-First Architecture, and Future Backend/PPOB Boundaries.
+> **Consolidated Sources:** Product Contract v1.1.0, YK-DOMAIN-03 Domain Logic Matrix, YK-DOMAIN-04 Multi-Branch Architecture, YK-DOMAIN-05 Consolidated v1.2.0, and YK-DOMAIN-12R Digital Transaction Contract Reconciliation.
 
 ---
 
@@ -61,7 +61,9 @@ All domain entities, repository interfaces, UseCases, and database schemas **mus
 | **DigitalDepositAccount** | Dedicated agent deposit balance used exclusively for digital fulfillment. | Saldo Deposit Digital |
 | **DigitalDepositMutation** | Traceable historical movement of digital deposit funds. | Mutasi Deposit Digital |
 | **DigitalTransaction** | Dedicated transaction record for electronic vouchers, tokens, and bills. | Transaksi Digital |
+| **DigitalTransactionComplaint** | Traceable issue report linked to a specific DigitalTransaction. | Komplain Transaksi Digital |
 | **Inquiry** | Read-only validation check prior to digital bill settlement. | Cek Tagihan / Cek Nomor |
+| **ServerDigitalCatalog** | Server-provided catalog of sellable digital denominations and bills. | Katalog Digital Server |
 | **License** | Software entitlement model granting branch seats and capabilities. | Lisensi Aplikasi |
 
 ---
@@ -103,6 +105,20 @@ Yukelola structures enterprise data through a clear hierarchy: **Business $\righ
                                        │ • Items      │
                                        │ • Debt (opt) │
                                        └──────────────┘
+                                              │
+                                              │ 1:*
+                                              ▼
+                                 ┌─────────────────────────┐
+                                 │   DigitalTransaction    │
+                                 ├─────────────────────────┤
+                                 │ • Cost & Selling Price  │
+                                 │ • Deposit Mutation Ref  │
+                                 └────────────┬────────────┘
+                                              │ 1:* (0..N)
+                                              ▼
+                                 ┌─────────────────────────┐
+                                 │DigitalTransact'nComplain│
+                                 └─────────────────────────┘
 ```
 
 ### Entity Catalog Definitions
@@ -132,6 +148,8 @@ Yukelola structures enterprise data through a clear hierarchy: **Business $\righ
 24. **`DigitalDepositAccount`:** Branch agent fulfillment fund (`id`, `businessId`, `branchId`, `currentBalance`, `updatedAt`).
 25. **`DigitalDepositMutation`:** Traceable deposit log (`id`, `businessId`, `branchId`, `accountId`, `mutationType` [`TOP_UP`, `DIGITAL_SALE`, `REFUND`, `REVERSAL`, `ADJUSTMENT`], `amount`, `balanceBefore`, `balanceAfter`, `referenceId?`, `notes`, `createdAt`).
 26. **`DigitalTransaction`:** Electronic transaction record (`id`, `businessId`, `branchId`, `userId`, `deviceId`, `saleId?`, `targetNumber`, `productCode`, `denomination`, `costPrice`, `sellingPrice`, `depositMutationId?`, `fulfillmentStatus` [`INITIATED`, `PENDING`, `SUCCESS`, `FAILED`, `REVERSED`], `providerReference?`, `failureReason?`, `createdAt`, `updatedAt`).
+27. **`DigitalTransactionComplaint`:** Traceable issue report (`id`, `digitalTransactionId`, `businessId`, `branchId`, `reason` [`PRODUCT_NOT_RECEIVED`, `WRONG_RESULT`, `TRANSACTION_STUCK`, `DESTINATION_PROBLEM`, `PROVIDER_RESULT_MISMATCH`, `CUSTOMER_DISPUTE`, `OTHER`], `description`, `status` [`OPEN`, `INVESTIGATING`, `RESOLVED`, `REJECTED`], `resolutionNotes?`, `resolvedAt?`, `createdAt`, `updatedAt`).
+28. **`Inquiry`:** Read-only validation check (`id`, `businessId`, `branchId`, `userId`, `deviceId`, `targetNumber`, `productCode`, `customerName?`, `billAmount?`, `adminFee`, `inquiryDataJson?`, `status` [`INITIATED`, `SUCCESS`, `FAILED`, `EXPIRED`], `inquiryReference?`, `failureReason?`, `createdAt`, `expiresAt?`, `updatedAt`).
 
 ---
 
@@ -159,20 +177,6 @@ A **Business Model** defines the primary operational identity, default navigatio
 │ 10. GENERAL_STORE    │ Multi-Category POS     │ RETAIL_TRANSACTION          │
 └──────────────────────┴────────────────────────┴─────────────────────────────┘
 ```
-
-### Business Context Rules
-1. **`RETAIL_HEALTH` (Apotek & Toko Obat):**
-   - Represents dedicated medicine and healthcare retail.
-   - Operates via `RETAIL_TRANSACTION` with multi-unit conversions (Box $\leftrightarrow$ Strip $\leftrightarrow$ Tablet).
-   - Profile `APOTEK`: Supports optional non-blocking prescription/doctor metadata notes.
-   - Profile `TOKO_OBAT`: Standard over-the-counter health merchandise.
-   - **Scope Boundary:** Batch numbering and expiry date tracking remain strictly **OUT OF SCOPE** for the core v1.x baseline.
-2. **`WARUNG + OBAT` Distinction:**
-   - A `RETAIL_WARUNG` selling auxiliary blister-pack medicine remains `RETAIL_WARUNG`.
-   - Medicines are managed as standard physical grocery SKUs without triggering pharmaceutical search or prescription metadata workflows.
-3. **`FOTOCOPY` Hybrid Execution:**
-   - Walk-in per-page copies execute via instant `RETAIL_TRANSACTION` (Page count $\times$ Rate).
-   - Large volume book printing or binding jobs route through `SERVICE_ORDER_TRANSACTION`.
 
 ---
 
@@ -206,6 +210,27 @@ Yukelola establishes three distinct operational transaction engines:
    - Down payment records immediate cash inflow in `CashRegister`.
    - Consumed spare parts/materials are deducted from branch stock upon work progress/completion.
    - Remaining balance is settled upon customer pickup.
+
+### Server-Provided Digital Product Catalog & Operator Input Contract
+1. **Source of Truth:** Digital products (vouchers, data packages, PLN tokens, billers) are provided by the **Yukelola Server / PPOB Catalog**. The cashier/operator **MUST NOT** manually create, edit, or maintain digital catalog items.
+2. **Operator Input Boundary:** Operator input is strictly confined to transactional input:
+   - Destination identifier / customer number (e.g., phone number, meter number).
+   - Selected denomination / product option from the server catalog.
+3. **Server-Controlled Attributes:** Product code, SKU, denomination nominal, provider cost price, base selling price, and provider routing metadata are strictly controlled by the server catalog.
+4. **Historical Snapshot Integrity:** Every `DigitalTransaction` records an immutable snapshot of `productCode`, `denomination`, `costPrice`, `sellingPrice`, `targetNumber`, `providerReference`, and `attribution`. Historical transactions are unaffected by subsequent catalog price changes.
+
+### Digital Transaction Complaints & Issue Traceability
+1. **Complaint Concept:** Every eligible `DigitalTransaction` supports $0..N$ traceable `DigitalTransactionComplaint` records.
+2. **Complaint Lifecycle:**
+   $$\text{OPEN} \longrightarrow \text{INVESTIGATING} \longrightarrow \text{RESOLVED}\ (\text{or}\ \text{REJECTED})$$
+3. **Controlled Reasons:** `PRODUCT_NOT_RECEIVED`, `WRONG_RESULT`, `TRANSACTION_STUCK`, `DESTINATION_PROBLEM`, `PROVIDER_RESULT_MISMATCH`, `CUSTOMER_DISPUTE`, `OTHER`.
+4. **Separation of Concerns:**
+   $$\mathbf{Complaint} \ne \mathbf{Reversal} \ne \mathbf{Refund} \ne \mathbf{DigitalTransactionStatus}$$
+   Opening, investigating, or resolving a complaint:
+   - Does **NOT** mutate `DigitalTransactionStatus` (it remains `SUCCESS` or `PENDING` unless a separate reversal workflow executes).
+   - Does **NOT** mutate `CashRegister` or `DigitalDepositAccount`.
+   - Does **NOT** create `Debt`, `Sale`, or `Inquiry`.
+5. **Branch Isolation:** A complaint must inherit and match the `businessId` and `branchId` of the referenced `DigitalTransaction`. Cross-branch complaints are prohibited.
 
 ---
 
@@ -249,7 +274,7 @@ Yukelola operates under a **Local-First, Offline-First, and Branch-Isolated** ar
 
 ### Branch Isolation Rules
 1. **Branch Data Sovereignty:** Every branch maintains an independent local SQLite/Room database hosted on the primary in-store terminal.
-2. **Strict Aggregate Isolation:** Stock, CashRegisters, CustomerDebts, SupplierDebts, DigitalDeposits, and ServiceOrders are 100% isolated to the local branch. Cross-branch direct transactional mutation is prohibited.
+2. **Strict Aggregate Isolation:** Stock, CashRegisters, CustomerDebts, SupplierDebts, DigitalDeposits, Complaints, and ServiceOrders are 100% isolated to the local branch. Cross-branch direct transactional mutation is prohibited.
 3. **Attribution Standard:** Every transactional record must log:
    $$\mathbf{Attribution} = \{\mathbf{businessId},\ \mathbf{branchId},\ \mathbf{userId},\ \mathbf{deviceId},\ \mathbf{cashierSessionId},\ \mathbf{createdAt}\}$$
 4. **Master Catalog vs Branch Overrides:** Global product definitions are managed at the Business level; local stock, reorder thresholds, availability, and pricing overrides are managed at the Branch level.
@@ -291,10 +316,10 @@ To maintain clean architectural boundaries, technical implementation details are
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│                      DOMAIN CONTRACT (LOCKED IN v1.2.0)                     │
+│                      DOMAIN CONTRACT (LOCKED IN v1.3.0)                     │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │ • Entities: Business, Branch, BusinessProfile, Product, Sale, ServiceOrder  │
-│ • Aggregates: CashRegister, DigitalDepositAccount, CustomerDebt, Session    │
+│ • Aggregates: CashRegister, DigitalDepositAccount, DigitalTx, Complaint     │
 │ • Invariants: Mathematical formulas, lifecycles, attribution, isolation     │
 │ • Transaction Modes: RETAIL_TRANSACTION, DIGITAL_TX, SERVICE_ORDER_TX       │
 └──────────────────────────────────────┬──────────────────────────────────────┘
@@ -333,3 +358,4 @@ The following remain strictly **OUT OF SCOPE** for the Yukelola core domain:
 | **1.0.0** | 2026-09-24 | YK-DOMAIN-01 | Initial canonical product & domain contract baseline. |
 | **1.1.0** | 2026-09-24 | YK-DOMAIN-01A| Reconciled Business Model vs Capability vs Transaction Mode; added Digital Deposit ledger. |
 | **1.2.0** | 2026-09-24 | YK-DOMAIN-05 | **Major Canonical Consolidation:**<br>- Integrated multi-branch hierarchy (`Business` $1:N$ `Branch`).<br>- Scoped `BusinessProfile`, `BusinessModel`, and `Capabilities` to Branch.<br>- Added `RETAIL_HEALTH` (Apotek + Toko Obat) & `WARUNG + OBAT` domain logic.<br>- Added unified `ServiceOrder` aggregate (Laundry, Workshop, Percetakan).<br>- Formalized 3 Transaction Modes (`RETAIL`, `DIGITAL`, `SERVICE_ORDER`).<br>- Added `User`, `Role`, `Device`, and `CashierSession` attribution.<br>- Added Global Master Catalog with `BranchProductOverride`.<br>- Formalized Local-First Branch Isolation and Safe Backup Policy (Google Sheets as export only). |
+| **1.3.0** | 2026-09-24 | YK-DOMAIN-12R| **Digital Transaction Contract Reconciliation:**<br>- Formalized Server-Provided Digital Product Catalog as canonical source of truth (operator does not manually create digital SKU catalog).<br>- Formalized Operator Input Contract (destination number + denomination selection).<br>- Added `DigitalTransactionComplaint` aggregate with controlled reasons and `OPEN` $\rightarrow$ `INVESTIGATING` $\rightarrow$ `RESOLVED` / `REJECTED` lifecycle.<br>- Established strict financial boundary: Complaint $\ne$ Reversal $\ne$ Refund.<br>- Enforced branch isolation and transaction reference binding on complaints. |
