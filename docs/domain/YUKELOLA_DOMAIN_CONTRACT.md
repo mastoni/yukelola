@@ -1,524 +1,335 @@
 # Yukelola Product & Domain Contract
 
-> **Contract Version:** 1.1.0
-> **Status:** LOCKED / CANONICAL SOURCE OF TRUTH
-> **Canonical Identity:** `id.yukelola`
-> **Target Scope:** Android Modular Monolith Core Domain, Room Database Entities, Repository Contracts, UseCases, Future Backend Services.
+> **Contract Version:** 1.2.0  
+> **Status:** LOCKED / CANONICAL SOURCE OF TRUTH  
+> **Canonical Identity:** `id.yukelola`  
+> **Target Scope:** Android Modular Monolith Core Domain (`:core:domain`), Room Database Entities (`:core:database`), Repository Contracts, UseCases, Multi-Branch Local-First Architecture, and Future Backend/PPOB Boundaries.  
+> **Consolidated Sources:** Product Contract v1.1.0, YK-DOMAIN-03 Domain Logic Matrix, and YK-DOMAIN-04 Multi-Branch Architecture.
 
 ---
 
-## 1. Product Vision & Boundary
+## 1. Product Vision & Operational Boundary
 
-Yukelola is a streamlined, transaction-oriented business management application designed for Indonesian micro, small, and medium enterprises (UMKM).
+Yukelola is a streamlined, transaction-oriented, local-first business operating system designed for Indonesian micro, small, and medium enterprises (UMKM).
 
 ### Core Philosophy
-- **Simple & Practical:** Fast, intuitive, and accessible to business owners with varying levels of financial and technical literacy.
-- **Mobile-First & Offline-First:** Core business operations (sales, purchases, cash drawer management, debts, inventory) operate reliably without an active internet connection.
-- **Transaction-Centric:** Driven by real-world transactions rather than complex double-entry accounting ledgers or full-scale enterprise ERP systems.
-- **Robust Domain Core:** Business rules, capabilities, and invariants are encapsulated in pure Kotlin domain models (`:core:domain`), independent of UI frameworks, database engines, or external services.
+- **Simple & Practical:** Fast, intuitive, and accessible to business owners and staff with varying levels of technical and financial literacy.
+- **Local-First & Offline-First:** Every branch maintains an independent, authoritative local database. Day-to-day point-of-sale, inventory tracking, cash drawer management, and service queues function 100% offline with zero reliance on an active internet connection or a central cloud database.
+- **Transaction-Centric:** Driven by real-world operational workflows (instant retail sales, digital fulfillment, and asynchronous service orders) rather than complex enterprise ERP or double-entry general ledger accounting.
+- **Strict Domain Core:** Business logic, capabilities, invariants, and aggregate lifecycles are encapsulated in pure Kotlin domain models (`:core:domain`), decoupled from UI frameworks, database engines, and hardware drivers.
 
 ---
 
 ## 2. Domain Glossary
 
-All domain code, interfaces, repository contracts, and database schemas **must** adhere strictly to the English business terminology defined below. Indonesian terms are reserved exclusively for UI presentation and localization strings.
+All domain entities, repository interfaces, UseCases, and database schemas **must** adhere strictly to the English business terminology defined below. Indonesian terms are reserved exclusively for UI presentation and localization strings.
 
-| Canonical Domain Term | Meaning & Purpose | UI / Localized Synonym (ID) |
+| Canonical Domain Term | Meaning & Purpose | Localized Synonym (ID) |
 |---|---|---|
-| **Business** | Aggregate root representing the tenant or enterprise entity. | Usaha / Bisnis |
-| **BusinessProfile** | Metadata and operational attributes of a business (name, contact, receipt header). | Profil Usaha |
-| **BusinessModel** | Primary operational identity and business logic profile of the enterprise. | Model Bisnis / Jenis Usaha |
-| **Capability** | Specific functional business module enabled for a business profile. | Fitur / Kemampuan Usaha |
-| **Product** | Any sellable unit of goods, services, or digital items. | Produk / Barang |
-| **ProductType** | Classification of goods fulfillment behavior (`PHYSICAL`, `SERVICE`, `DIGITAL`). | Jenis Produk |
-| **Category** | Organizational grouping for products. | Kategori |
-| **Unit** | Measurement unit for physical goods (e.g., PCS, KG, PACK, LITER). | Satuan |
-| **Stock** | Available on-hand quantity for physical goods. | Stok / Persediaan |
-| **StockAdjustment** | Manual inventory count correction (opname, damage, shrinkage). | Penyesuaian Stok |
-| **Sale** | Record of a customer transaction, selling products for monetary compensation. | Penjualan / Transaksi |
-| **SaleItem** | Line item in a sale referencing product, quantity, unit price, and discounts. | Item Penjualan |
-| **Purchase** | Record of inventory acquisition from a supplier. | Pembelian / Kulakan |
+| **Business** | Aggregate root representing the enterprise / legal tenant entity. | Usaha / Bisnis |
+| **Branch** | Physical store, outlet, or operational branch unit under a Business. | Cabang / Outlet |
+| **BusinessProfile** | Operational metadata, contact info, and receipt settings scoped to a Branch. | Profil Cabang / Usaha |
+| **BusinessModel** | Primary operational identity and workflow archetype of a Branch. | Model Bisnis / Jenis Usaha |
+| **Capability** | Modular functional feature set enabled for a Branch. | Fitur / Kemampuan Usaha |
+| **User** | System operator or staff member with role-based authority. | Pengguna / Staf |
+| **Role** | Authority tier (`OWNER`, `MANAGER`, `CASHIER`). | Peran Pengguna |
+| **Device** | Physical Android terminal registered and paired to a Branch. | Perangkat / Terminal |
+| **CashierSession** | Active shift session binding a user, device, and cash drawer. | Sesi Kasir / Shift |
+| **Product** | Global sellable catalog definition (SKU, barcode, name, category, unit). | Master Produk |
+| **BranchProductOverride** | Branch-specific operational product state (stock, pricing, availability). | Stok & Harga Cabang |
+| **ProductType** | Fulfillment classification (`PHYSICAL`, `SERVICE`, `DIGITAL`). | Jenis Produk |
+| **Category** | Organizational classification for catalog items. | Kategori |
+| **Unit** | Measurement unit for physical goods (e.g., PCS, KG, STRIP, BOX, LITER). | Satuan |
+| **StockAdjustment** | Manual inventory count correction (opname, damage, loss). | Penyesuaian Stok |
+| **Sale** | Record of a completed customer retail transaction. | Penjualan / Struk |
+| **SaleItem** | Line item in a sale referencing product snapshot and pricing. | Item Penjualan |
+| **ServiceOrder** | Asynchronous service/job aggregate (Laundry, Workshop, Printing). | Order Layanan / SPK |
+| **ServiceOrderItem** | Line item in a ServiceOrder (labor service or consumed spare parts). | Item Layanan |
+| **ServiceOrderStatus** | Operational state (`RECEIVED`, `IN_PROGRESS`, `READY`, `COMPLETED`, `CANCELLED`). | Status Order |
+| **DownPaymentRecord** | Upfront financial deposit collected upon service intake. | Uang Muka / DP |
+| **Purchase** | Record of inventory replenishment from a supplier. | Pembelian / Kulakan |
 | **PurchaseItem** | Line item in a purchase record with quantity and cost price. | Item Pembelian |
-| **Payment** | Financial settlement event applied to a Sale, Purchase, or Debt. | Pembayaran |
+| **Payment** | Financial settlement event applied to a Sale, Purchase, Debt, or ServiceOrder. | Pembayaran |
 | **Discount** | Monetary or percentage reduction applied to an item or entire transaction. | Diskon / Potongan |
-| **Customer** | External entity purchasing goods or services, with potential debt balance. | Pelanggan |
-| **Supplier** | External vendor supplying goods or materials, with potential payable balance. | Pemasok / Supplier |
-| **CustomerDebt** | Outstanding receivable owed by a customer to the business (Piutang). | Piutang Pelanggan / Kasbon |
-| **SupplierDebt** | Outstanding payable owed by the business to a supplier (Hutang). | Hutang Pemasok |
+| **Customer** | Buyer profile with optional credit ledger balance. | Pelanggan |
+| **Supplier** | Vendor profile with optional payable balance. | Pemasok / Supplier |
+| **CustomerDebt** | Outstanding receivable owed by a customer (Piutang). | Piutang Pelanggan / Kasbon |
+| **SupplierDebt** | Outstanding payable owed to a supplier (Hutang). | Hutang Pemasok |
 | **DebtPayment** | Financial event reducing an outstanding customer or supplier debt. | Pembayaran Hutang / Piutang |
-| **CashRegister** | Cash drawer / register session tracking physical cash inflows, outflows, and balance. | Buku Kas / Kasir |
-| **CashMutation** | Non-sale / non-purchase cash adjustment (cash in, cash out, expense). | Mutasi Kas / Pengeluaran |
-| **DigitalDepositAccount** | Dedicated agent deposit balance used exclusively for digital product fulfillment. | Saldo Deposit Digital |
-| **DigitalDepositMutation** | Traceable historical movement of digital agent deposit funds. | Mutasi Deposit Digital |
-| **DigitalTransaction** | Dedicated transaction record for electronic vouchers, tokens, and bill payments. | Transaksi Digital |
-| **Inquiry** | Read-only validation and bill retrieval check prior to digital settlement. | Cek Tagihan / Cek Nomor |
-| **License** | Software entitlement model granting application features and validity. | Lisensi Aplikasi |
+| **CashRegister** | Cash drawer manager tracking physical cash balance and mutations. | Buku Kas / Kasir |
+| **CashMutation** | Non-sale / non-purchase cash adjustment (inflow, outflow, expense). | Mutasi Kas / Pengeluaran |
+| **DigitalDepositAccount** | Dedicated agent deposit balance used exclusively for digital fulfillment. | Saldo Deposit Digital |
+| **DigitalDepositMutation** | Traceable historical movement of digital deposit funds. | Mutasi Deposit Digital |
+| **DigitalTransaction** | Dedicated transaction record for electronic vouchers, tokens, and bills. | Transaksi Digital |
+| **Inquiry** | Read-only validation check prior to digital bill settlement. | Cek Tagihan / Cek Nomor |
+| **License** | Software entitlement model granting branch seats and capabilities. | Lisensi Aplikasi |
 
 ---
 
-## 3. Entity Catalog
+## 3. Entity Catalog & Domain Hierarchy
+
+Yukelola structures enterprise data through a clear hierarchy: **Business $\rightarrow$ Branch $\rightarrow$ Operational Aggregates**.
 
 ```
-                    ┌─────────────────────────┐
-                    │        Business         │
-                    └────────────┬────────────┘
-                                 │ 1:1
-                    ┌────────────▼────────────┐
-                    │     BusinessProfile     │
-                    │  (BusinessModel, etc.)  │
-                    └────────────┬────────────┘
-                                 │
-     ┌────────────────┬──────────┴─────────┬────────────────┬────────────────────────┐
-     │ 1:*            │ 1:*                 │ 1:*            │ 1:*                    │ 1:1
-┌────▼──────┐   ┌─────▼───────┐      ┌─────▼──────┐   ┌─────▼──────┐      ┌───────────▼───────────┐
-│  Category │   │   Product   │      │  Customer  │   │  Supplier  │      │ DigitalDepositAccount │
-└───────────┘   └─────┬───────┘      └─────┬──────┘   └─────┬──────┘      └───────────┬───────────┘
-                      │                    │                │                         │ 1:*
-                      │ 1:* (SaleItem)     │ 0..1           │ 0..1                    │
-                ┌─────▼────────────────────▼─────┐    ┌─────▼──────────┐              ▼
-                │              Sale              │    │    Purchase    │    ┌───────────────────┐
-                ├────────────────────────────────┤    ├────────────────┤    │   DigitalDeposit  │
-                │ - SaleItems                    │    │ - PurchaseItems│    │      Mutation     │
-                │ - Payments                     │    │ - Payments     │    └───────────────────┘
-                │ - CustomerDebt (if credit)     │    │ - SupplierDebt │
-                └──────────────┬─────────────────┘    └─────┬──────────┘
-                               │                            │
-                               └───────────┬────────────────┘
-                                           │ Impacts
-                               ┌───────────▼────────────┐
-                               │      CashRegister      │
-                               │  - Inflow / Outflow    │
-                               └────────────────────────┘
+                               ┌─────────────────────────────┐
+                               │          Business           │ (Tenant Root)
+                               └──────────────┬──────────────┘
+                                              │ 1:*
+                               ┌──────────────▼──────────────┐
+                               │           Branch            │ (Operational Unit)
+                               ├─────────────────────────────┤
+                               │ • BusinessProfile           │
+                               │ • BusinessModel             │
+                               │ • Enabled Capabilities      │
+                               └──────────────┬──────────────┘
+                                              │
+         ┌──────────────────┬─────────────────┼──────────────────┬──────────────────┐
+         │ 1:*              │ 1:*             │ 1:*              │ 1:*              │ 1:1
+         ▼                  ▼                 ▼                  ▼                  ▼
+  ┌──────────────┐   ┌──────────────┐  ┌──────────────┐   ┌──────────────┐   ┌─────────────────────┐
+  │BranchProduct │   │   Customer   │  │   Supplier   │   │ CashRegister │   │DigitalDepositAccount│
+  │   Override   │   └──────┬───────┘  └──────┬───────┘   └──────┬───────┘   └──────────┬──────────┘
+  └──────┬───────┘          │                 │                  │ Impacts              │ 1:*
+         │                  │                 │                  ▼                      ▼
+         │ 1:*              │ 0..1            │ 0..1      ┌──────────────┐   ┌─────────────────────┐
+         ▼                  ▼                 │           │ CashMutation │   │DigitalDepositMutat'n│
+  ┌──────────────┐   ┌──────────────┐         │           └──────────────┘   └─────────────────────┘
+  │     Sale     │   │ ServiceOrder │         │
+  ├──────────────┤   ├──────────────┤         │ 1:*
+  │ • SaleItems  │   │ • OrderItems │         ▼
+  │ • Payments   │   │ • DownPayment│  ┌──────────────┐
+  │ • Debt (opt) │   │ • Debt (opt) │  │   Purchase   │
+  └──────────────┘   └──────────────┘  ├──────────────┤
+                                       │ • Items      │
+                                       │ • Debt (opt) │
+                                       └──────────────┘
 ```
 
-### Entity Definitions & Identifiers
-1. **Business**: Aggregate Root. Identifies the primary business context (`id`, `createdAt`, `isActive`).
-2. **BusinessProfile**: Profile entity (`businessId`, `name`, `businessModel`, `enabledCapabilities`, `phone`, `address`, `receiptFooter`, `currency`, `timezone`).
-3. **Category**: Organizational taxonomy (`id`, `businessId`, `name`, `color`, `icon`, `sortOrder`).
-4. **Product**: Sellable catalog item (`id`, `businessId`, `categoryId`, `sku`, `name`, `productType`, `unit`, `purchasePrice`, `sellingPrice`, `stock`, `minStock`, `trackStock`, `isActive`).
-5. **Customer**: Buyer profile (`id`, `businessId`, `name`, `phone`, `email`, `address`, `debtBalance`, `notes`, `isActive`).
-6. **Supplier**: Vendor profile (`id`, `businessId`, `name`, `contactPerson`, `phone`, `address`, `debtBalance`, `isActive`).
-7. **Sale**: Sale transaction aggregate (`id`, `businessId`, `saleNumber`, `transactionMode`, `customerId`, `subtotal`, `discountAmount`, `taxAmount`, `totalAmount`, `paidAmount`, `paymentStatus`, `fulfillmentStatus`, `notes`, `createdAt`).
-8. **SaleItem**: Immutable snapshot line (`id`, `saleId`, `productId`, `productName`, `unit`, `unitPrice`, `costPrice`, `quantity`, `discountAmount`, `subtotal`).
-9. **Purchase**: Inventory order aggregate (`id`, `businessId`, `purchaseNumber`, `supplierId`, `totalAmount`, `paidAmount`, `paymentStatus`, `createdAt`).
-10. **PurchaseItem**: Line item (`id`, `purchaseId`, `productId`, `productName`, `unitCost`, `quantity`, `subtotal`).
-11. **Payment**: Payment execution (`id`, `businessId`, `transactionType` [SALE/PURCHASE/DEBT/DIGITAL], `referenceId`, `paymentMethod`, `amount`, `createdAt`).
-12. **CustomerDebt**: Receivable tracking (`id`, `businessId`, `customerId`, `saleId`, `originalAmount`, `remainingAmount`, `status`, `dueDate`, `createdAt`).
-13. **SupplierDebt**: Payable tracking (`id`, `businessId`, `supplierId`, `purchaseId`, `originalAmount`, `remainingAmount`, `status`, `dueDate`, `createdAt`).
-14. **DebtPayment**: Debt settlement record (`id`, `businessId`, `debtType` [CUSTOMER/SUPPLIER], `debtId`, `amount`, `paymentMethod`, `notes`, `createdAt`).
-15. **CashRegister**: Physical cash drawer manager (`id`, `businessId`, `name`, `currentBalance`, `updatedAt`).
-16. **CashMutation**: Cash inflow/outflow record (`id`, `businessId`, `registerId`, `mutationType` [INFLOW/OUTFLOW], `category`, `amount`, `source`, `referenceId`, `notes`, `createdAt`).
-17. **StockAdjustment**: Inventory reconciliation record (`id`, `businessId`, `productId`, `adjustmentType` [ADD/SUBTRACT/SET], `quantity`, `reason`, `createdAt`).
-18. **DigitalDepositAccount**: Dedicated digital agent balance (`id`, `businessId`, `currentBalance`, `currency`, `updatedAt`).
-19. **DigitalDepositMutation**: Traceable deposit history (`id`, `businessId`, `accountId`, `mutationType` [TOP_UP/DIGITAL_SALE/REFUND/REVERSAL/ADJUSTMENT], `amount`, `balanceBefore`, `balanceAfter`, `referenceId`, `notes`, `createdAt`).
-20. **DigitalTransaction**: Electronic transaction record (`id`, `businessId`, `saleId`, `targetNumber`, `productCode`, `denomination`, `costPrice`, `sellingPrice`, `depositMutationId`, `fulfillmentStatus` [INITIATED/PENDING/SUCCESS/FAILED/REVERSED], `providerReference`, `failureReason`, `createdAt`, `updatedAt`).
+### Entity Catalog Definitions
+1. **`Business`:** Aggregate Root representing the merchant enterprise (`id`, `legalName`, `ownerUserId`, `createdAt`, `isActive`).
+2. **`Branch`:** Operational outlet entity (`id`, `businessId`, `code`, `name`, `businessProfile`, `businessModel`, `enabledCapabilities`, `isActive`).
+3. **`BusinessProfile`:** Scoped branch metadata (`name`, `phone`, `address`, `receiptHeader`, `receiptFooter`, `currency`, `timezone`).
+4. **`User` & `Role`:** Staff entity (`id`, `businessId`, `branchId?`, `username`, `fullName`, `role` [`OWNER`, `MANAGER`, `CASHIER`], `pinHash`, `isActive`).
+5. **`Device`:** Hardware terminal paired to a branch (`id`, `businessId`, `branchId`, `deviceName`, `deviceType` [`MAIN_HOST_TABLET`, `SECONDARY_CASHIER_TERMINAL`, `MANAGER_PHONE`, `OWNER_PHONE`], `isActive`).
+6. **`CashierSession`:** Active drawer shift (`id`, `branchId`, `userId`, `deviceId`, `openingBalance`, `closingBalance?`, `openedAt`, `closedAt?`, `status`).
+7. **`Product`:** Global catalog definition (`id`, `businessId`, `categoryId`, `sku`, `barcode`, `name`, `productType`, `baseUnit`, `defaultCostPrice`, `defaultSellingPrice`, `isActive`).
+8. **`BranchProductOverride`:** Branch inventory & pricing ledger (`branchId`, `productId`, `stock`, `minStock`, `localCostPrice?`, `localSellingPrice?`, `isAvailable`).
+9. **`Category`:** Global classification taxonomy (`id`, `businessId`, `name`, `color`, `icon`, `sortOrder`).
+10. **`Customer`:** Buyer profile (`id`, `businessId`, `branchId?`, `name`, `phone`, `debtBalance`, `isActive`).
+11. **`Supplier`:** Vendor profile (`id`, `businessId`, `name`, `phone`, `debtBalance`, `isActive`).
+12. **`Sale`:** Instant retail transaction aggregate (`id`, `businessId`, `branchId`, `userId`, `deviceId`, `cashierSessionId?`, `saleNumber`, `transactionMode`, `customerId?`, `subtotal`, `discountAmount`, `taxAmount`, `totalAmount`, `paidAmount`, `paymentStatus`, `fulfillmentStatus`, `createdAt`).
+13. **`SaleItem`:** Immutable historical line item (`id`, `saleId`, `productId`, `productName`, `unit`, `unitPrice`, `costPrice`, `quantity`, `discountAmount`, `subtotal`).
+14. **`ServiceOrder`:** Asynchronous service order aggregate (`id`, `businessId`, `branchId`, `userId`, `deviceId`, `orderNumber`, `customerId?`, `orderType` [`LAUNDRY`, `WORKSHOP`, `PRINTING`, `CUSTOM`], `fulfillmentStatus` [`RECEIVED`, `IN_PROGRESS`, `READY`, `COMPLETED`, `CANCELLED`], `totalAmount`, `downPaymentAmount`, `remainingBalance`, `contextMetadataJson?`, `estimatedCompletionDate?`, `createdAt`, `updatedAt`).
+15. **`ServiceOrderItem`:** Line item in ServiceOrder (`id`, `orderId`, `productId`, `productName`, `itemType` [`SERVICE_LABOR`, `PHYSICAL_PART`], `unitPrice`, `costPrice`, `quantity`, `subtotal`).
+16. **`Purchase`:** Inventory replenishment aggregate (`id`, `businessId`, `branchId`, `userId`, `purchaseNumber`, `supplierId?`, `totalAmount`, `paidAmount`, `paymentStatus`, `createdAt`).
+17. **`PurchaseItem`:** Purchase line item (`id`, `purchaseId`, `productId`, `productName`, `unitCost`, `quantity`, `subtotal`).
+18. **`Payment`:** Financial settlement record (`id`, `businessId`, `branchId`, `transactionType` [`SALE`, `SERVICE_ORDER`, `PURCHASE`, `CUSTOMER_DEBT`, `SUPPLIER_DEBT`], `referenceId`, `paymentMethod`, `amount`, `createdAt`).
+19. **`CustomerDebt`:** Customer credit receivable (`id`, `businessId`, `branchId`, `customerId`, `referenceType` [`SALE`, `SERVICE_ORDER`], `referenceId`, `originalAmount`, `remainingAmount`, `status`, `dueDate?`, `createdAt`).
+20. **`SupplierDebt`:** Supplier credit payable (`id`, `businessId`, `branchId`, `supplierId`, `purchaseId`, `originalAmount`, `remainingAmount`, `status`, `dueDate?`, `createdAt`).
+21. **`DebtPayment`:** Debt reduction event (`id`, `businessId`, `branchId`, `debtType` [`CUSTOMER`, `SUPPLIER`], `debtId`, `amount`, `paymentMethod`, `notes`, `createdAt`).
+22. **`CashRegister`:** Branch cash drawer manager (`id`, `businessId`, `branchId`, `name`, `currentBalance`, `updatedAt`).
+23. **`CashMutation`:** Cash drawer movement (`id`, `businessId`, `branchId`, `registerId`, `cashierSessionId?`, `mutationType` [`INFLOW`, `OUTFLOW`], `category`, `amount`, `source`, `referenceId?`, `notes`, `createdAt`).
+24. **`DigitalDepositAccount`:** Branch agent fulfillment fund (`id`, `businessId`, `branchId`, `currentBalance`, `updatedAt`).
+25. **`DigitalDepositMutation`:** Traceable deposit log (`id`, `businessId`, `branchId`, `accountId`, `mutationType` [`TOP_UP`, `DIGITAL_SALE`, `REFUND`, `REVERSAL`, `ADJUSTMENT`], `amount`, `balanceBefore`, `balanceAfter`, `referenceId?`, `notes`, `createdAt`).
+26. **`DigitalTransaction`:** Electronic transaction record (`id`, `businessId`, `branchId`, `userId`, `deviceId`, `saleId?`, `targetNumber`, `productCode`, `denomination`, `costPrice`, `sellingPrice`, `depositMutationId?`, `fulfillmentStatus` [`INITIATED`, `PENDING`, `SUCCESS`, `FAILED`, `REVERSED`], `providerReference?`, `failureReason?`, `createdAt`, `updatedAt`).
 
 ---
 
-## 4. Entity Responsibilities & Boundaries
+## 4. Business Models & Operational Logic
 
-- **Business & Profile:** Encapsulate enterprise identity, primary business model, and enabled capabilities. They govern which modules and transaction modes are active.
-- **Product:** Manages catalog data, pricing, and active status. Physical stock count is kept consistent via transaction mutations.
-- **Sale & Purchase:** Serve as immutable historic commercial records. Once completed, line items reflect the exact prices and names at the moment of execution.
-- **Debts (Customer / Supplier):** Explicitly decouple unpaid credit obligations from completed transaction records. A credit sale is completed from a sales perspective, and the outstanding balance is tracked in the CustomerDebt ledger.
-- **CashRegister:** Records physical drawer movements. It does not calculate accounting profits, only physical cash flows and drawer reconciliations.
-- **DigitalDepositAccount:** Manages electronic agent fulfillment funds. Strictly isolated from physical cash drawer funds.
-- **DigitalTransaction:** Encapsulates the multi-step lifecycle, target destination, and fulfillment states of digital products.
+$$\mathbf{Business\ Model} \ne \mathbf{Capability} \ne \mathbf{Product\ Type} \ne \mathbf{Transaction\ Mode}$$
+
+A **Business Model** defines the primary operational identity, default navigation hierarchy, and terminal workflow of a **Branch**. Capabilities extend functionality modularly.
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                       YUKELOLA BUSINESS MODEL TAXONOMY                      │
+├──────────────────────┬────────────────────────┬─────────────────────────────┤
+│ BUSINESS MODEL       │ OPERATIONAL ARCHETYPE  │ PRIMARY TRANSACTION MODE    │
+├──────────────────────┼────────────────────────┼─────────────────────────────┤
+│ 1. RETAIL_WARUNG     │ Over-the-counter POS   │ RETAIL_TRANSACTION          │
+│ 2. DIGITAL_KIOSK     │ Electronic Operator    │ DIGITAL_TRANSACTION         │
+│ 3. FOOD_BEVERAGE_CAFE│ Menu & Table Tabs      │ RETAIL_TRANSACTION          │
+│ 4. SERVICE_WORKSHOP  │ Vehicle Repair & Parts │ SERVICE_ORDER_TRANSACTION   │
+│ 5. LAUNDRY           │ Weight/Item Drop-off   │ SERVICE_ORDER_TRANSACTION   │
+│ 6. RETAIL_HEALTH     │ Pharmaceutical POS     │ RETAIL_TRANSACTION          │
+│ 7. PERCETAKAN        │ Custom Print Job Order │ SERVICE_ORDER_TRANSACTION   │
+│ 8. FOTOCOPY          │ Counter Calc / Bulk Job│ RETAIL / SERVICE_ORDER      │
+│ 9. ATK               │ Multi-Unit Barcode POS │ RETAIL_TRANSACTION          │
+│ 10. GENERAL_STORE    │ Multi-Category POS     │ RETAIL_TRANSACTION          │
+└──────────────────────┴────────────────────────┴─────────────────────────────┘
+```
+
+### Business Context Rules
+1. **`RETAIL_HEALTH` (Apotek & Toko Obat):**
+   - Represents dedicated medicine and healthcare retail.
+   - Operates via `RETAIL_TRANSACTION` with multi-unit conversions (Box $\leftrightarrow$ Strip $\leftrightarrow$ Tablet).
+   - Profile `APOTEK`: Supports optional non-blocking prescription/doctor metadata notes.
+   - Profile `TOKO_OBAT`: Standard over-the-counter health merchandise.
+   - **Scope Boundary:** Batch numbering and expiry date tracking remain strictly **OUT OF SCOPE** for the core v1.x baseline.
+2. **`WARUNG + OBAT` Distinction:**
+   - A `RETAIL_WARUNG` selling auxiliary blister-pack medicine remains `RETAIL_WARUNG`.
+   - Medicines are managed as standard physical grocery SKUs without triggering pharmaceutical search or prescription metadata workflows.
+3. **`FOTOCOPY` Hybrid Execution:**
+   - Walk-in per-page copies execute via instant `RETAIL_TRANSACTION` (Page count $\times$ Rate).
+   - Large volume book printing or binding jobs route through `SERVICE_ORDER_TRANSACTION`.
 
 ---
 
-## 5. Relationships & Cardinality
+## 5. Transaction Modes & Settlement Mechanics
 
-| Source Entity | Cardinality | Target Entity | Relationship Semantics |
-|---|---|---|---|
-| `Business` | `1 : 1` | `BusinessProfile` | Strict ownership, created on onboarding. |
-| `Business` | `1 : 1` | `DigitalDepositAccount` | Optional/Created when `DIGITAL_DEPOSIT` capability is enabled. |
-| `Business` | `1 : *` | `Category` | Categorization taxonomy owned by business. |
-| `Business` | `1 : *` | `Product` | Products belong to one business tenant. |
-| `Business` | `1 : *` | `Customer` | Customer list scoped per business. |
-| `Business` | `1 : *` | `Supplier` | Supplier contacts scoped per business. |
-| `Business` | `1 : *` | `Sale` | Sales history scoped per business. |
-| `Sale` | `1 : *` | `SaleItem` | Cascade lifecycle; items belong exclusively to parent Sale. |
-| `Sale` | `0..1 : 1` | `Customer` | Optional; guest sales have null customer. |
-| `Sale` | `1 : *` | `Payment` | One sale can have multiple payments (split/installments). |
-| `Sale` | `1 : 0..1` | `CustomerDebt` | Created if `paidAmount < totalAmount` and Customer is present. |
-| `Sale` | `1 : 0..1` | `DigitalTransaction` | 1:1 linkage when transactionMode = `DIGITAL_TRANSACTION`. |
-| `Purchase` | `1 : *` | `PurchaseItem` | Items belong exclusively to parent Purchase. |
-| `Purchase` | `0..1 : 1` | `Supplier` | Optional or specified vendor. |
-| `Purchase` | `1 : 0..1` | `SupplierDebt` | Created if `paidAmount < totalAmount` on credit purchase. |
-| `Customer` | `1 : *` | `CustomerDebt` | Aggregate receivable balance for a customer. |
-| `Supplier` | `1 : *` | `SupplierDebt` | Aggregate payable balance for a supplier. |
-| `CashRegister`| `1 : *` | `CashMutation` | Historical audit log of cash movements. |
-| `DigitalDepositAccount` | `1 : *` | `DigitalDepositMutation` | Historical audit log of deposit movements. |
+Yukelola establishes three distinct operational transaction engines:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                             TRANSACTION MODES                               │
+├──────────────────────────┬───────────────────────────┬──────────────────────┤
+│ 1. RETAIL_TRANSACTION    │ 2. DIGITAL_TRANSACTION    │ 3. SERVICE_ORDER_TX  │
+├──────────────────────────┼───────────────────────────┼──────────────────────┤
+│ • Instant Checkout       │ • Electronic Operator     │ • Asynchronous Queue │
+│ • Immediate Stock Decrement│ • Digital Deposit Debit │ • Down Payment + Rem │
+│ • Cash/QRIS/Kasbon       │ • Read-Only Inquiry       │ • Work Order Progress│
+└──────────────────────────┴───────────────────────────┴──────────────────────┘
+```
+
+### Transaction Mode Rules
+1. **`RETAIL_TRANSACTION`:**
+   - Synchronous instant execution.
+   - Decrements `BranchProductOverride.stock` for `PHYSICAL` products.
+   - Increases `CashRegister` by cash paid; creates `CustomerDebt` if `paidAmount < totalAmount`.
+2. **`DIGITAL_TRANSACTION`:**
+   - Debits `DigitalDepositAccount` by distributor `costPrice`.
+   - Physical stock count is **UNTOUCHED**.
+   - Inquiry checks are strictly read-only and idempotent (never debit cash, deposit, or create sales).
+3. **`SERVICE_ORDER_TRANSACTION`:**
+   - Manages asynchronous job lifecycle: `RECEIVED` $\rightarrow$ `IN_PROGRESS` $\rightarrow$ `READY` $\rightarrow$ `COMPLETED` (or `CANCELLED`).
+   - Down payment records immediate cash inflow in `CashRegister`.
+   - Consumed spare parts/materials are deducted from branch stock upon work progress/completion.
+   - Remaining balance is settled upon customer pickup.
 
 ---
 
-## 6. Ownership & Aggregate Boundaries
+## 6. Financial Ledgers & Core Invariants
 
-1. **Catalog Aggregate:** Root = `Product`. Contains pricing, stock limits, and measurement units.
-2. **Sales Aggregate:** Root = `Sale`. Contains `SaleItem` list, discount specifications, attached `Payment` records, and optional `DigitalTransaction` linkage.
-3. **Purchase Aggregate:** Root = `Purchase`. Contains `PurchaseItem` list and initial purchase payments.
-4. **Party Aggregates:** `Customer` and `Supplier` manage contact details and aggregate credit/payable balances.
-5. **Cash Aggregate:** `CashRegister` manages cash on hand and serializes `CashMutation` records.
-6. **Digital Deposit Aggregate:** `DigitalDepositAccount` manages agent balance and serializes `DigitalDepositMutation` records.
+Yukelola strictly preserves mathematical separation between distinct financial assets:
+
+$$\mathbf{CashRegister} \ne \mathbf{DigitalDepositAccount} \ne \mathbf{CustomerDebt} \ne \mathbf{SupplierDebt}$$
+
+$$\mathbf{Cash\ Balance} \ne \mathbf{Business\ Profit}$$
+$$\mathbf{Deposit\ Top\text{-}Up} \ne \mathbf{Revenue}$$
+
+### Core Financial Invariants
+1. **Deposit Top-Up Invariant:** Adding funds to `DigitalDepositAccount` is an internal capital relocation ($\text{Cash} \rightarrow \text{Digital Deposit}$) and **must never** be recorded as sales revenue or gross profit.
+2. **Digital Profit Recognition:** Realized immediately upon successful dispatch as the spread:
+   $$\text{Digital Gross Profit} = \text{Selling Price} - \text{Distributor Cost Price}$$
+3. **Down Payment Recognition:** Down payments collected on service orders represent unearned revenue / customer deposits until service fulfillment.
+4. **Compensating Reversal Invariant:** Failed digital transactions or voided sales must produce traceable compensating mutation records (`REFUND` / `REVERSAL`), never destructive balance overwrites.
+5. **Debt Reduction Invariant:** Customer debt payments decrease `CustomerDebt.remainingAmount` and record cash inflows without double-counting historical sales revenue.
+6. **No Double-Entry General Ledger:** Full double-entry journal accounting, balance sheets, and chart of accounts remain strictly out of scope.
 
 ---
 
-## 7. Lifecycle States
+## 7. Multi-Branch Local-First Architecture
 
-### Sale Lifecycle
-```
-[DRAFT] ──(Confirm & Pay)──► [COMPLETED] ──(Void/Cancel)──► [CANCELLED]
-```
-- `DRAFT`: Active cart / pending order.
-- `COMPLETED`: Inventory decremented, cash recorded, customer debt recorded if unpaid balance exists.
-- `CANCELLED`: Only permitted under strict void/reversal rules; reverts stock and cash effects.
+Yukelola operates under a **Local-First, Offline-First, and Branch-Isolated** architecture.
 
-### Digital Transaction Lifecycle
 ```
-[INITIATED] ──(Submit to Provider)──► [PENDING] ──(Provider Success)──► [SUCCESS]
+                         ┌─────────────────────────────────┐
+                         │   Branch Local Network (LAN)    │
+                         │      (NO INTERNET REQUIRED)     │
+                         └───────────────┬─────────────────┘
                                          │
-                                         └──(Provider Fail)──► [FAILED] ──(Auto-Refund)──► [REVERSED]
-```
-- `INITIATED`: Target verified, deposit debited/reserved, awaiting fulfillment dispatch.
-- `PENDING`: Dispatched to network/provider; awaiting terminal status.
-- `SUCCESS`: Confirmed by provider; deposit debit finalized, sale complete.
-- `FAILED`: Provider returned failure or timeout expired.
-- `REVERSED`: Deposit restored to `DigitalDepositAccount` via explicit `REVERSAL` / `REFUND` mutation.
-
-### Inquiry Lifecycle (Bill / Number Check)
-```
-[INITIATED] ──(Query Provider/Cache)──► [SUCCESS] ──(TTL Expired)──► [EXPIRED]
-                   │
-                   └──(Query Error)──► [FAILED]
-```
-- **Inquiry Invariant:** An Inquiry MUST NEVER debit cash, debit digital deposit, create a completed sale, or trigger provider fulfillment. It is strictly read-only validation data.
-
-### Debt Lifecycle (Customer & Supplier)
-```
-[UNPAID] ──(Partial Payment)──► [PARTIALLY_PAID] ──(Full Settlement)──► [SETTLED]
+                 ┌───────────────────────┼───────────────────────┐
+                 ▼                       ▼                       ▼
+      ┌─────────────────────┐ ┌─────────────────────┐ ┌─────────────────────┐
+      │  Branch Host Node   │ │ Secondary Cashier 1 │ │ Secondary Cashier 2 │
+      │  (Authoritative DB) │ │ (POS Client Tablet) │ │ (POS Client Phone)  │
+      └─────────────────────┘ └─────────────────────┘ └─────────────────────┘
 ```
 
----
-
-## 8. Product Types & Fulfillment Semantics
-
-Product Type defines **how a product is fulfilled physically or electronically**.
-
-| Product Type | Inventory Tracking | Fulfillment Behavior | Example Items |
-|---|---|---|---|
-| **PHYSICAL** | Tracked (`stock` decrements on sale, increments on purchase). Reorder alert on `stock <= minStock`. | Physical handover of goods across counter. | Beras, Minyak Goreng, Snack, Rokok, Bensin Eceran, Minuman Dingin. |
-| **SERVICE** | Untracked (`trackStock = false`). Stock quantity is not decremented. | Service execution / labor provided. | Jasa Jahit, Potong Rambut, Servis Motor, Cuci Mobil. |
-| **DIGITAL** | Untracked physical inventory. Unit price, purchase cost, and digital deposit tracked. | Digital token, electronic top-up, serial code, voucher. | Pulsa Telkomsel, Token Listrik PLN, Topup DANA/GoPay, Voucher Game. |
+### Branch Isolation Rules
+1. **Branch Data Sovereignty:** Every branch maintains an independent local SQLite/Room database hosted on the primary in-store terminal.
+2. **Strict Aggregate Isolation:** Stock, CashRegisters, CustomerDebts, SupplierDebts, DigitalDeposits, and ServiceOrders are 100% isolated to the local branch. Cross-branch direct transactional mutation is prohibited.
+3. **Attribution Standard:** Every transactional record must log:
+   $$\mathbf{Attribution} = \{\mathbf{businessId},\ \mathbf{branchId},\ \mathbf{userId},\ \mathbf{deviceId},\ \mathbf{cashierSessionId},\ \mathbf{createdAt}\}$$
+4. **Master Catalog vs Branch Overrides:** Global product definitions are managed at the Business level; local stock, reorder thresholds, availability, and pricing overrides are managed at the Branch level.
+5. **Cross-Branch Reporting:** Consolidated reporting is an offline aggregation and export concern on the Owner console (via Google Drive or local files), not a real-time shared database.
 
 ---
 
-## 9. Business Models (Primary Business Profiles)
-
-Business Model defines the **primary operational identity and business logic profile** of the enterprise.
-
-$$\text{Business Model} \ne \text{Product Type} \ne \text{Capability} \ne \text{Transaction Mode}$$
-
-1. **`RETAIL_WARUNG` (Retail-First):**
-   - *Primary Model:* `RETAIL`
-   - *Operational Focus:* Fast over-the-counter sales of physical goods, inventory tracking, restocking, customer kasbon / debts.
-   - *Secondary Extensions:* Can enable optional capabilities (e.g., `DIGITAL_SERVICE`, `FUEL`) without turning the business into a Konter.
-2. **`DIGITAL_KIOSK` / `KONTER` (Digital-First):**
-   - *Primary Model:* `DIGITAL_SERVICE`
-   - *Operational Focus:* Fast mobile credit, data packages, electricity tokens, e-wallet top-ups, digital deposit management.
-   - *Secondary Extensions:* Can optionally sell physical accessories (cases, chargers, cables) via secondary retail capability.
-3. **`FOOD_BEVERAGE_CAFE` (F&B-First):**
-   - *Primary Model:* `FOOD_BEVERAGE`
-   - *Operational Focus:* Menu-oriented items, fast dine-in/takeaway ordering, optional table/seat notes, kitchen prep grouping.
-4. **`SERVICE_WORKSHOP` (Service-First):**
-   - *Primary Model:* `SERVICE`
-   - *Operational Focus:* Labor/service fees, repair orders, customer asset/vehicle notes, physical spare parts sales.
-5. **`GENERAL_STORE` (Mixed Retail):**
-   - *Primary Model:* `MIXED_RETAIL`
-   - *Operational Focus:* Multi-category general trade without a single mandatory primary workflow.
-
----
-
-## 10. Capability Model
-
-Capabilities represent **functional modules** that can be enabled or disabled for a business profile.
-
-| Capability | Description & Business Value | Required Entities / Dependencies |
-|---|---|---|
-| `RETAIL` | Standard barcode scanning, cart management, and retail receipt generation. | `Product` (PHYSICAL), `SaleItem` |
-| `INVENTORY` | Tracking stock levels, low-stock alerts, and manual adjustments. | `Product.stock`, `StockAdjustment` |
-| `PURCHASE` | Recording supplier stock replenishment and cost prices. | `Purchase`, `PurchaseItem`, `Supplier` |
-| `DIGITAL_SERVICE` | Dedicated UI and workflow for selling digital goods and bill payments. | `DigitalTransaction`, `Product` (DIGITAL) |
-| `DIGITAL_DEPOSIT` | Dedicated balance tracking and mutation history for digital agent funds. | `DigitalDepositAccount`, `DigitalDepositMutation` |
-| `PPOB` | Automated connectivity to external digital product aggregators/providers. | Future provider adapter layer |
-| `FUEL` | Specialized unit pricing for retail fuel (Bensin Eceran / Pertalite). | `Product` (PHYSICAL, unit: LITER) |
-| `FOOD_BEVERAGE` | Kitchen notes, dine-in/takeaway tagging, menu grouping. | `Sale.notes`, `Category` |
-| `SERVICE` | Work order recording, labor fee tracking, service duration/status. | `Product` (SERVICE) |
-| `CUSTOMER_DEBT` | Customer credit book (Catatan Kasbon Pelanggan). | `Customer`, `CustomerDebt`, `DebtPayment` |
-| `SUPPLIER_DEBT` | Supplier payable book (Catatan Hutang Kulakan). | `Supplier`, `SupplierDebt`, `DebtPayment` |
-| `CASH` | Cash drawer management, daily opening/closing balance, expense tracking. | `CashRegister`, `CashMutation` |
-| `REPORTING` | Historical transaction summaries, gross profit projections, cash book. | Projection read-models |
-
----
-
-## 11. Business Type → Logic Contract
-
-Selecting a Business Type configures the **default business logic profile and capability matrix**, not merely superficial labels.
-
-### Logic Profiles by Business Type
-- **WARUNG (Standard):**
-  - *Primary Transaction Mode:* `RETAIL_TRANSACTION`
-  - *Default Capabilities:* `RETAIL`, `INVENTORY`, `PURCHASE`, `CASH`, `CUSTOMER_DEBT`, `SUPPLIER_DEBT`, `REPORTING`.
-- **WARUNG + DIGITAL SERVICE:**
-  - *Primary Transaction Mode:* `RETAIL_TRANSACTION` (Home/POS defaults to retail goods).
-  - *Secondary Transaction Mode:* `DIGITAL_TRANSACTION` (Dedicated "Layanan Digital" tab/section).
-  - *Enabled Capabilities:* Standard Warung + `DIGITAL_SERVICE` + `DIGITAL_DEPOSIT`.
-  - *Logic Rule:* The business remains a Warung; retail POS and digital transactions remain separate operational experiences.
-- **WARUNG + BENSIN:**
-  - *Primary Transaction Mode:* `RETAIL_TRANSACTION`.
-  - *Enabled Capabilities:* Standard Warung + `FUEL`.
-  - *Logic Rule:* Fuel is treated as a physical inventory item with decimal/liter measurements, not a distinct business model.
-- **KONTER (Digital Kiosk):**
-  - *Primary Transaction Mode:* `DIGITAL_TRANSACTION` (Home/POS opens directly to digital phone/token entry).
-  - *Secondary Transaction Mode:* `RETAIL_TRANSACTION` (Optional "Aksesoris / Barang Fisik" section).
-  - *Enabled Capabilities:* `DIGITAL_SERVICE`, `DIGITAL_DEPOSIT`, `CASH`, `CUSTOMER_DEBT`, `REPORTING`, optional `RETAIL`.
-
----
-
-## 12. Business Type → UX Context Contract
-
-The UI is a presentation of underlying domain capabilities. Selecting a Business Type influences:
-
-1. **Default Terminology:** Adapts localized copy (e.g., "Menu" in Cafe vs "Barang" in Warung vs "Layanan" in Konter).
-2. **Dashboard & Navigation Hierarchy:**
-   - In `RETAIL_WARUNG`: Primary tab = Retail POS. Digital services appear under a secondary "Layanan Digital" hub.
-   - In `DIGITAL_KIOSK`: Primary tab = Digital Transaction keypad & quick provider buttons. Physical items appear under a secondary catalog.
-3. **Retail vs Digital UX Separation:**
-   - Digital products (pulsa, token, e-wallet) **must never** be dumped into the standard physical product grid.
-   - Digital sales require destination number input, operator auto-detection, denomination picker, and inquiry confirmation.
-4. **Digital Deposit Visibility:** The digital deposit widget and balance banner only render when `DIGITAL_DEPOSIT` capability is active.
-5. **Contextual Form Fields:** Dynamic display of specialized fields (e.g., Table Number for Cafe, Vehicle/Police Plate for Workshop).
-
----
-
-## 13. Retail Transaction Contract
-
-### Flow
-```
-Product Catalog / Barcode Scan
-  └──► Active Cart (SaleItems)
-         └──► Discount / Customer Selection
-                └──► Checkout (Payment: Cash / Transfer / Debt)
-                       ├──► Stock Decrement (for PHYSICAL items)
-                       ├──► Cash Register Inflow (for CASH payments)
-                       └──► Customer Debt Creation (if unpaid balance)
-```
-
-### Financial & Stock Effects
-- `Product.stock` decreases by sold quantity.
-- `CashRegister` increases by cash paid.
-- `CustomerDebt` increases if `paidAmount < totalAmount`.
-- `DigitalDepositAccount` is **UNTOUCHED**.
-
----
-
-## 14. Digital Transaction Contract
-
-### Flow
-```
-Digital Services Hub
-  └──► Select Service Category (Pulsa / Token PLN / E-Wallet)
-         └──► Enter Target Number (Phone / Meter No / Account)
-                └──► [Optional] Inquiry Validation Check
-                       └──► Select Denomination / Product
-                              └──► Customer Payment Settlement
-                                     └──► Reserve / Debit Digital Deposit
-                                            └──► Provider Fulfillment Dispatch
-                                                   ├──► SUCCESS: Finalize transaction
-                                                   └──► FAILED: Trigger deterministic Reversal / Refund
-```
-
-### Financial & Deposit Effects
-- `Customer Payment:` Increases `CashRegister` by selling price (if paid in cash).
-- `Digital Fulfillment:` Decreases `DigitalDepositAccount` by product `costPrice`.
-- `Gross Margin:` Immediate profit realization = $\text{Selling Price} - \text{Cost Price}$.
-- `Product.stock` is **UNTOUCHED** (digital goods have no physical warehouse count).
-
----
-
-## 15. Digital Deposit (Deposit Digital)
-
-The digital agent deposit represents working capital held with digital distributors/aggregators to fulfill electronic transactions.
-
-### Domain Entities
-- **`DigitalDepositAccount`:** Single aggregate per business holding `currentBalance`.
-- **`DigitalDepositMutation`:** Immutable log of all balance changes.
-
-### Supported Mutation Types
-1. `TOP_UP`: Adding working capital to the digital deposit balance.
-2. `DIGITAL_SALE`: Debiting deposit to fulfill a completed digital product sale.
-3. `REFUND`: Returning debited deposit to account following a failed transaction.
-4. `REVERSAL`: Administrative correction of an errant transaction.
-5. `ADJUSTMENT`: Manual balance correction with recorded justification.
-
-### Business Use Cases (Conceptual)
-- `GetDigitalDepositBalance(businessId)`
-- `TopUpDigitalDeposit(businessId, amount, paymentSource)`
-- `GetDigitalDepositMutations(businessId, dateRange)`
-- `ReserveDigitalDeposit(businessId, transactionId, amount)`
-- `CompleteDigitalTransaction(businessId, transactionId)`
-- `FailDigitalTransaction(businessId, transactionId, reason)`
-- `ReverseDigitalTransaction(businessId, transactionId)`
-
----
-
-## 16. Cash vs. Digital Deposit Separation
-
-Physical cash and digital agent deposits represent **distinct, non-interchangeable financial assets**. They MUST NOT be combined into a single balance.
-
-| Property | CashRegister | DigitalDepositAccount |
-|---|---|---|
-| **Physical Reality** | Physical bank notes & coins in the drawer. | Electronic balance held with digital provider/aggregator. |
-| **Primary Inflow** | Customer cash payments, debt settlements, owner capital in. | Deposit Top-Up transfers. |
-| **Primary Outflow** | Cash purchases, operational expenses, owner cash drawings. | Digital product fulfillments (pulsa, token, e-wallet). |
-| **Impact of Digital Sale** | **Increases** by customer selling price (cash paid). | **Decreases** by distributor cost price (debited balance). |
-| **Impact of Deposit Top-Up** | **Decreases** by top-up amount (cash used to buy deposit). | **Increases** by top-up amount (credited balance). |
-
-### Traceable Example Flow
-1. **Initial State:** Cash = Rp 500.000 | Deposit = Rp 200.000
-2. **Action: Top Up Deposit Rp 100.000 using cash:**
-   - Cash: $\text{Rp } 500.000 - \text{Rp } 100.000 = \mathbf{Rp\ 400.000}$ (recorded as `CashMutation.OUTFLOW`)
-   - Deposit: $\text{Rp } 200.000 + \text{Rp } 100.000 = \mathbf{Rp\ 300.000}$ (recorded as `DigitalDepositMutation.TOP_UP`)
-3. **Action: Sell Token PLN Rp 20.000 (Cost = Rp 20.200, Sell = Rp 23.000, Customer pays Cash):**
-   - Customer pays cash: Cash increases by Rp 23.000 $\rightarrow \mathbf{Rp\ 423.000}$ (`Sale.paidAmount`)
-   - Provider debits deposit: Deposit decreases by Rp 20.200 $\rightarrow \mathbf{Rp\ 279.800}$ (`DigitalDepositMutation.DIGITAL_SALE`)
-   - Net profit earned = $\text{Rp } 23.000 - \text{Rp } 20.200 = \mathbf{Rp\ 2.800}$.
-4. **Final State:** Cash = Rp 423.000 | Deposit = Rp 279.800.
-
----
-
-## 17. Sale Transaction Rules & Invariants
-
-1. **Item Price Snapshotting:** `SaleItem` must store the exact `unitPrice` and `costPrice` at transaction time. Subsequent changes to `Product.sellingPrice` must NEVER alter historical sale items.
-2. **Subtotal & Total Formula:**
-   $$\text{SaleItem.subtotal} = (\text{quantity} \times \text{unitPrice}) - \text{itemDiscount}$$
-   $$\text{Sale.subtotal} = \sum \text{SaleItem.subtotal}$$
-   $$\text{Sale.totalAmount} = \max(0, \text{Sale.subtotal} - \text{Sale.discountAmount} + \text{Sale.taxAmount})$$
-3. **Credit Sale Validation:**
-   - If `paidAmount < totalAmount`, `Sale.customerId` **must not be null**. Anonymous guest credit sales are strictly forbidden by domain invariants.
-   - A `CustomerDebt` record is created for the remaining balance ($\text{totalAmount} - \text{paidAmount}$).
-
----
-
-## 18. Purchase Transaction Rules & Invariants
-
-1. **Cost Price Tracking:** `PurchaseItem.unitCost` represents the inventory acquisition cost.
-2. **Inventory Invariant:**
-   - Completed Purchase with `ProductType.PHYSICAL` $\rightarrow$ Increments `Product.stock` by purchased quantity.
-3. **Financial Invariant:**
-   - Completed Purchase paid in cash $\rightarrow$ Decrements `CashRegister` balance.
-   - Completed Purchase on credit $\rightarrow$ Requires valid `supplierId`, creates `SupplierDebt` for unpaid balance.
-
----
-
-## 19. Debt Rules (Customer & Supplier)
-
-### Customer Debt (Piutang)
-1. **Origin:** Created exclusively from a credit `Sale` with an assigned `Customer`.
-2. **Settlement Invariant:**
-   - Debt payment received $\rightarrow$ Decreases `CustomerDebt.remainingAmount`, decreases `Customer.debtBalance`.
-   - If paid in cash $\rightarrow$ Creates `CashMutation.INFLOW` and increments `CashRegister`.
-3. **Zero Balance Constraint:** `remainingAmount` cannot drop below zero.
-
-### Supplier Debt (Hutang)
-1. **Origin:** Created from a credit `Purchase` with an assigned `Supplier`.
-2. **Settlement Invariant:**
-   - Debt payment made $\rightarrow$ Decreases `SupplierDebt.remainingAmount`, decreases `Supplier.debtBalance`.
-   - If paid from cash drawer $\rightarrow$ Creates `CashMutation.OUTFLOW` and decrements `CashRegister`.
-
----
-
-## 20. Stock & Inventory Rules
-
-1. **Stock Ownership:** Only `PHYSICAL` products maintain inventory quantity. `SERVICE` and `DIGITAL` products bypass inventory tracking.
-2. **Negative Stock Policy:** Default domain configuration prevents negative stock unless the business profile explicitly enables `allowNegativeStock = true`.
-3. **Stock Adjustment:** All manual stock adjustments must capture an explicit `reason` (`STOCK_OPNAME`, `DAMAGED`, `EXPIRED`, `LOST`, `INTERNAL_USE`).
-
----
-
-## 21. Report & Projection Boundary
-
-- **Projections Only:** Reports (Sales summary, profit/loss, daily cash book, top products, customer debt balance) are **pure projections** derived from completed transactions.
-- **Strict Distinction:** Reports must separate:
-  - Retail Sales vs. Digital Sales.
-  - Physical Cash Movements vs. Digital Deposit Movements.
-- **Deposit Top-Up is NOT Revenue/Profit:** Top-up transactions are internal capital transfers (Cash $\rightarrow$ Deposit) and must never be counted as sales revenue or business profit.
-- **Estimated Gross Profit Formula:**
-  $$\text{Gross Profit} = \sum (\text{SaleItem.subtotal} - (\text{SaleItem.quantity} \times \text{SaleItem.costPrice})) - \text{Sale.discountAmount}$$
-
----
-
-## 22. License Boundary
-
-- **Separation of Concerns:** The licensing domain (`:core:license`) is completely decoupled from business transaction mechanics.
-- **Entitlements:** License evaluates feature flags such as `maxProducts`, `cloudSyncEnabled`, `advancedReportsEnabled`, `multiDeviceEnabled`.
-- **Core Persistence Independence:** Expiration of a license must **never** lock or destroy local business data or prevent read access to historic transactions.
-
----
-
-## 23. Offline-First Architecture Contract
-
-1. **Local-First Authority:** Every transaction (Sale, Purchase, Payment, Debt) must succeed and commit locally to Room Database without network availability.
-2. **Canonical Identifiers:** All primary keys for synchronized entities use standard UUID (v4) or collision-resistant monotonic string IDs generated on the local client.
-3. **Optimistic Mutation:** State changes are applied locally immediately and marked with sync metadata (`syncStatus`: `PENDING`, `SYNCED`, `CONFLICT`).
-
----
-
-## 24. Future PPOB & Digital Provider Boundary
-
-PPOB (Payment Point Online Bank) and digital aggregators represent external third-party fulfillment services. The core domain strictly defines the boundary:
+## 8. Backup, Recovery & Google Services Policy
 
 ```
-┌────────────────────────────────────────────────────────┐
-│                   Yukelola Core Domain                 │
-│  - ProductType: DIGITAL                                │
-│  - DigitalTransaction & DigitalDepositAccount          │
-│  - Inquiry Capability & Confirmation Model             │
-│  - FulfillmentStatus: INITIATED|PENDING|SUCCESS|FAILED │
-└───────────────────────────┬────────────────────────────┘
-                            │ (Future Adapter Boundary)
-                            ▼
-┌────────────────────────────────────────────────────────┐
-│              Future PPOB Transaction Adapter           │
-│  - Provider API Adapters (Digiflazz, MobilePulsa, etc.)│
-│  - Provider Balance & Idempotency Key Management       │
-│  - Callback / Webhook Listeners & Reconciliation        │
-│  - Retry & Timeout Engines                             │
-└────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         BACKUP & SAFETY CONTRACT                            │
+├────────────────────────────────┬────────────────────────────────────────────┤
+│ 1. Operational Database        │ Authoritative Local SQLite / Room DB       │
+│ 2. Primary Disaster Backup     │ Encrypted Binary Snapshots (.ykbak)        │
+│ 3. Cloud Storage Target        │ Google Drive (App Data / User Storage)     │
+│ 4. Local Storage Target        │ SD Card / USB OTG Storage                  │
+│ 5. Google Sheets Role          │ OPTIONAL ONE-WAY ANALYTICAL EXPORT ONLY    │
+└────────────────────────────────┴────────────────────────────────────────────┘
 ```
 
-*Note: No provider credentials, HTTP clients, or provider SDKs are included in the core domain.*
+### Safety Rules
+1. **Google Sheets Restriction:** Google Sheets is **STRICTLY PROHIBITED** from serving as an operational transaction database or bidirectional sync engine due to fatal risks of data loss, lack of ACID guarantees, schema truncation, and concurrency collisions.
+2. **Deterministic Backup:** The authoritative disaster recovery mechanism is an encrypted SQLite binary snapshot (`.ykbak`) backed up to Google Drive or local storage at shift close.
 
 ---
 
-## 25. Domain Invariants Summary
+## 9. License Architecture & Offline Validation
 
-1. **Sale Completeness:** A `Sale` with status `COMPLETED` must have at least one `SaleItem`.
-2. **Anonymous Credit Prohibition:** Unpaid or partially paid sales without an assigned `Customer` are rejected.
-3. **Non-Negative Monetary Amounts:** Unit prices, totals, payments, and discounts must be $\ge 0$.
-4. **Idempotent Payments:** Sum of payments attached to a transaction cannot exceed total amount unless recording change/kembalian.
-5. **Deposit Solvency:** Digital transaction cannot dispatch if $\text{DigitalDepositAccount.currentBalance} < \text{Product.costPrice}$.
-6. **Deterministic Failure Reversal:** Failed digital transactions must produce a compensating `DigitalDepositMutation.REFUND` or `REVERSAL` to preserve auditability.
-7. **Inquiry Isolation:** Inquiries must not mutate cash, deposit, or sales records.
-8. **Historical Immutability:** Completed sales and purchases are immutable; modifications must use cancellation/void workflow.
+1. **Licensing Hierarchy:** $\mathbf{License} \longrightarrow \mathbf{Business} \longrightarrow \mathbf{Branches} \longrightarrow \mathbf{Users\ \&\ Devices}$.
+2. **Offline Verification:** Validated locally via cryptographically signed tokens.
+3. **Data Sovereign Guarantee:** License expiration or network outage **never locks, corrupts, or deletes** local business databases. Historical data and export features remain accessible.
 
 ---
 
-## 26. Explicit Out-of-Scope Items
+## 10. Separation of Concerns: Domain vs. Infrastructure
 
-The following are explicitly **out of scope** for the Yukelola core domain:
-- Complex multi-branch double-entry journal accounting.
-- Warehouse bin management, batch numbering, and expiry tracking.
+To maintain clean architectural boundaries, technical implementation details are strictly decoupled from the pure domain model:
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      DOMAIN CONTRACT (LOCKED IN v1.2.0)                     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ • Entities: Business, Branch, BusinessProfile, Product, Sale, ServiceOrder  │
+│ • Aggregates: CashRegister, DigitalDepositAccount, CustomerDebt, Session    │
+│ • Invariants: Mathematical formulas, lifecycles, attribution, isolation     │
+│ • Transaction Modes: RETAIL_TRANSACTION, DIGITAL_TX, SERVICE_ORDER_TX       │
+└──────────────────────────────────────┬──────────────────────────────────────┘
+                                       │ Implemented by
+                                       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                 INFRASTRUCTURE & ARCHITECTURE SPECIFICATIONS                │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ • Room DAOs, SQLite tables, WAL mode, foreign keys, migrations              │
+│ • Local Network: mDNS / NSD discovery, local REST/RPC transport             │
+│ • Security: AES-256-GCM backup encryption, PIN hashing                      │
+│ • Cloud Adapters: Google Drive REST API, Google Sheets export formatting    │
+│ • Hardware Drivers: ESC/POS Bluetooth/USB printer, Barcode wedge scanner   │
+│ • External PPOB: Third-party provider HTTP adapters and webhook listeners   │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 11. Explicit Out-of-Scope Items
+
+The following remain strictly **OUT OF SCOPE** for the Yukelola core domain:
+- Complex multi-branch double-entry journal accounting and balance sheets.
+- Multi-warehouse bin management, batch numbering, and expiry date tracking (FEFO/FIFO).
 - Multi-tier composite manufacturing bills of materials (BOM).
-- Payroll and employee shift commissions.
-- Direct provider PPOB API client integration in the local domain module.
+- Employee payroll and commission calculation engines.
+- Direct external PPOB provider SDKs or credentials inside core domain modules.
+- Bidirectional database synchronization via spreadsheets.
+
+---
+
+## 12. Version History & Changelog
+
+| Version | Date | Gate | Summary of Key Changes |
+|---|---|---|---|
+| **1.0.0** | 2026-09-24 | YK-DOMAIN-01 | Initial canonical product & domain contract baseline. |
+| **1.1.0** | 2026-09-24 | YK-DOMAIN-01A| Reconciled Business Model vs Capability vs Transaction Mode; added Digital Deposit ledger. |
+| **1.2.0** | 2026-09-24 | YK-DOMAIN-05 | **Major Canonical Consolidation:**<br>- Integrated multi-branch hierarchy (`Business` $1:N$ `Branch`).<br>- Scoped `BusinessProfile`, `BusinessModel`, and `Capabilities` to Branch.<br>- Added `RETAIL_HEALTH` (Apotek + Toko Obat) & `WARUNG + OBAT` domain logic.<br>- Added unified `ServiceOrder` aggregate (Laundry, Workshop, Percetakan).<br>- Formalized 3 Transaction Modes (`RETAIL`, `DIGITAL`, `SERVICE_ORDER`).<br>- Added `User`, `Role`, `Device`, and `CashierSession` attribution.<br>- Added Global Master Catalog with `BranchProductOverride`.<br>- Formalized Local-First Branch Isolation and Safe Backup Policy (Google Sheets as export only). |
