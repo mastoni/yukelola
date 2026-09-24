@@ -449,4 +449,20 @@ class YukelolaDatabaseTest {
         assertNotNull("Generated YukelolaDatabase_Impl must implement inquiryDao method", method)
         assertEquals(id.yukelola.core.database.dao.InquiryDao::class.java, method!!.returnType)
     }
+
+    @Test
+    fun `YukelolaDatabase declares digitalTransactionComplaintDao getter`() {
+        val method = YukelolaDatabase::class.java.methods.firstOrNull { it.name == "digitalTransactionComplaintDao" }
+        assertNotNull("YukelolaDatabase must declare abstract digitalTransactionComplaintDao method", method)
+        assertEquals(0, method!!.parameterTypes.size)
+        assertEquals(id.yukelola.core.database.dao.DigitalTransactionComplaintDao::class.java, method.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase_Impl implements digitalTransactionComplaintDao`() {
+        val implClass = Class.forName("id.yukelola.core.database.YukelolaDatabase_Impl")
+        val method = implClass.methods.firstOrNull { it.name == "digitalTransactionComplaintDao" }
+        assertNotNull("Generated YukelolaDatabase_Impl must implement digitalTransactionComplaintDao method", method)
+        assertEquals(id.yukelola.core.database.dao.DigitalTransactionComplaintDao::class.java, method!!.returnType)
+    }
 }

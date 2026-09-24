@@ -13,6 +13,7 @@ import id.yukelola.core.database.dao.CustomerDebtDao
 import id.yukelola.core.database.dao.DebtPaymentDao
 import id.yukelola.core.database.dao.DigitalDepositAccountDao
 import id.yukelola.core.database.dao.DigitalDepositMutationDao
+import id.yukelola.core.database.dao.DigitalTransactionComplaintDao
 import id.yukelola.core.database.dao.DigitalTransactionDao
 import id.yukelola.core.database.dao.DownPaymentRecordDao
 import id.yukelola.core.database.dao.InquiryDao
@@ -38,6 +39,7 @@ import id.yukelola.core.database.entity.CustomerEntity
 import id.yukelola.core.database.entity.DebtPaymentEntity
 import id.yukelola.core.database.entity.DigitalDepositAccountEntity
 import id.yukelola.core.database.entity.DigitalDepositMutationEntity
+import id.yukelola.core.database.entity.DigitalTransactionComplaintEntity
 import id.yukelola.core.database.entity.DigitalTransactionEntity
 import id.yukelola.core.database.entity.DownPaymentRecordEntity
 import id.yukelola.core.database.entity.InquiryEntity
@@ -79,7 +81,8 @@ import id.yukelola.core.database.entity.SupplierEntity
         ServiceOrderItemEntity::class,
         DownPaymentRecordEntity::class,
         DigitalTransactionEntity::class,
-        InquiryEntity::class
+        InquiryEntity::class,
+        DigitalTransactionComplaintEntity::class
     ],
     version = 1,
     exportSchema = true
@@ -101,6 +104,7 @@ abstract class YukelolaDatabase : RoomDatabase() {
     abstract fun digitalDepositAccountDao(): DigitalDepositAccountDao
     abstract fun digitalDepositMutationDao(): DigitalDepositMutationDao
     abstract fun digitalTransactionDao(): DigitalTransactionDao
+    abstract fun digitalTransactionComplaintDao(): DigitalTransactionComplaintDao
     abstract fun inquiryDao(): InquiryDao
     abstract fun paymentDao(): PaymentDao
     abstract fun saleDao(): SaleDao
