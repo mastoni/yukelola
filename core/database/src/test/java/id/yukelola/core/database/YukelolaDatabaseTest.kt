@@ -369,4 +369,52 @@ class YukelolaDatabaseTest {
         assertNotNull("Generated YukelolaDatabase_Impl must implement purchaseItemDao method", method)
         assertEquals(id.yukelola.core.database.dao.PurchaseItemDao::class.java, method!!.returnType)
     }
+
+    @Test
+    fun `YukelolaDatabase declares serviceOrderDao getter`() {
+        val method = YukelolaDatabase::class.java.methods.firstOrNull { it.name == "serviceOrderDao" }
+        assertNotNull("YukelolaDatabase must declare abstract serviceOrderDao method", method)
+        assertEquals(0, method!!.parameterTypes.size)
+        assertEquals(id.yukelola.core.database.dao.ServiceOrderDao::class.java, method.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase_Impl implements serviceOrderDao`() {
+        val implClass = Class.forName("id.yukelola.core.database.YukelolaDatabase_Impl")
+        val method = implClass.methods.firstOrNull { it.name == "serviceOrderDao" }
+        assertNotNull("Generated YukelolaDatabase_Impl must implement serviceOrderDao method", method)
+        assertEquals(id.yukelola.core.database.dao.ServiceOrderDao::class.java, method!!.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase declares serviceOrderItemDao getter`() {
+        val method = YukelolaDatabase::class.java.methods.firstOrNull { it.name == "serviceOrderItemDao" }
+        assertNotNull("YukelolaDatabase must declare abstract serviceOrderItemDao method", method)
+        assertEquals(0, method!!.parameterTypes.size)
+        assertEquals(id.yukelola.core.database.dao.ServiceOrderItemDao::class.java, method.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase_Impl implements serviceOrderItemDao`() {
+        val implClass = Class.forName("id.yukelola.core.database.YukelolaDatabase_Impl")
+        val method = implClass.methods.firstOrNull { it.name == "serviceOrderItemDao" }
+        assertNotNull("Generated YukelolaDatabase_Impl must implement serviceOrderItemDao method", method)
+        assertEquals(id.yukelola.core.database.dao.ServiceOrderItemDao::class.java, method!!.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase declares downPaymentRecordDao getter`() {
+        val method = YukelolaDatabase::class.java.methods.firstOrNull { it.name == "downPaymentRecordDao" }
+        assertNotNull("YukelolaDatabase must declare abstract downPaymentRecordDao method", method)
+        assertEquals(0, method!!.parameterTypes.size)
+        assertEquals(id.yukelola.core.database.dao.DownPaymentRecordDao::class.java, method.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase_Impl implements downPaymentRecordDao`() {
+        val implClass = Class.forName("id.yukelola.core.database.YukelolaDatabase_Impl")
+        val method = implClass.methods.firstOrNull { it.name == "downPaymentRecordDao" }
+        assertNotNull("Generated YukelolaDatabase_Impl must implement downPaymentRecordDao method", method)
+        assertEquals(id.yukelola.core.database.dao.DownPaymentRecordDao::class.java, method!!.returnType)
+    }
 }
