@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "2b1f2c6fc1f50c30f13dfeafd15a7702",
+    "identityHash": "ac4c72fc6f5cbf74853e380714ab02f4",
     "entities": [
       {
         "tableName": "businesses",
@@ -4092,12 +4092,167 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "users",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `business_id` TEXT NOT NULL, `branch_id` TEXT, `username` TEXT NOT NULL, `full_name` TEXT NOT NULL, `role` TEXT NOT NULL, `is_active` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`business_id`) REFERENCES `businesses`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`branch_id`) REFERENCES `branches`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "businessId",
+            "columnName": "business_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "branchId",
+            "columnName": "branch_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fullName",
+            "columnName": "full_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "role",
+            "columnName": "role",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "is_active",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_users_business_id",
+            "unique": false,
+            "columnNames": [
+              "business_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_users_business_id` ON `${TABLE_NAME}` (`business_id`)"
+          },
+          {
+            "name": "index_users_branch_id",
+            "unique": false,
+            "columnNames": [
+              "branch_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_users_branch_id` ON `${TABLE_NAME}` (`branch_id`)"
+          },
+          {
+            "name": "index_users_username",
+            "unique": false,
+            "columnNames": [
+              "username"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_users_username` ON `${TABLE_NAME}` (`username`)"
+          },
+          {
+            "name": "index_users_role",
+            "unique": false,
+            "columnNames": [
+              "role"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_users_role` ON `${TABLE_NAME}` (`role`)"
+          },
+          {
+            "name": "index_users_is_active",
+            "unique": false,
+            "columnNames": [
+              "is_active"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_users_is_active` ON `${TABLE_NAME}` (`is_active`)"
+          },
+          {
+            "name": "index_users_business_id_branch_id",
+            "unique": false,
+            "columnNames": [
+              "business_id",
+              "branch_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_users_business_id_branch_id` ON `${TABLE_NAME}` (`business_id`, `branch_id`)"
+          },
+          {
+            "name": "index_users_business_id_username",
+            "unique": true,
+            "columnNames": [
+              "business_id",
+              "username"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_users_business_id_username` ON `${TABLE_NAME}` (`business_id`, `username`)"
+          },
+          {
+            "name": "index_users_business_id_role",
+            "unique": false,
+            "columnNames": [
+              "business_id",
+              "role"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_users_business_id_role` ON `${TABLE_NAME}` (`business_id`, `role`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "businesses",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "business_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "branches",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "branch_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b1f2c6fc1f50c30f13dfeafd15a7702')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ac4c72fc6f5cbf74853e380714ab02f4')"
     ]
   }
 }
