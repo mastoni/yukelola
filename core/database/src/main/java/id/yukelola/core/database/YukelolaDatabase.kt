@@ -8,6 +8,7 @@ import id.yukelola.core.database.dao.BusinessDao
 import id.yukelola.core.database.dao.CategoryDao
 import id.yukelola.core.database.dao.CustomerDao
 import id.yukelola.core.database.dao.CustomerDebtDao
+import id.yukelola.core.database.dao.DebtPaymentDao
 import id.yukelola.core.database.dao.ProductDao
 import id.yukelola.core.database.dao.ProductUnitDao
 import id.yukelola.core.database.dao.SupplierDao
@@ -18,6 +19,7 @@ import id.yukelola.core.database.entity.BusinessEntity
 import id.yukelola.core.database.entity.CategoryEntity
 import id.yukelola.core.database.entity.CustomerDebtEntity
 import id.yukelola.core.database.entity.CustomerEntity
+import id.yukelola.core.database.entity.DebtPaymentEntity
 import id.yukelola.core.database.entity.ProductEntity
 import id.yukelola.core.database.entity.ProductUnitEntity
 import id.yukelola.core.database.entity.SupplierDebtEntity
@@ -34,7 +36,8 @@ import id.yukelola.core.database.entity.SupplierEntity
         CustomerEntity::class,
         SupplierEntity::class,
         SupplierDebtEntity::class,
-        CustomerDebtEntity::class
+        CustomerDebtEntity::class,
+        DebtPaymentEntity::class
     ],
     version = 1,
     exportSchema = true
@@ -50,4 +53,5 @@ abstract class YukelolaDatabase : RoomDatabase() {
     abstract fun supplierDao(): SupplierDao
     abstract fun supplierDebtDao(): SupplierDebtDao
     abstract fun customerDebtDao(): CustomerDebtDao
+    abstract fun debtPaymentDao(): DebtPaymentDao
 }
