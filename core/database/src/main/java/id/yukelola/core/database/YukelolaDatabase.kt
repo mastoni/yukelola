@@ -12,6 +12,7 @@ import id.yukelola.core.database.dao.CategoryDao
 import id.yukelola.core.database.dao.CustomerDao
 import id.yukelola.core.database.dao.CustomerDebtDao
 import id.yukelola.core.database.dao.DebtPaymentDao
+import id.yukelola.core.database.dao.DeviceDao
 import id.yukelola.core.database.dao.DigitalDepositAccountDao
 import id.yukelola.core.database.dao.DigitalDepositMutationDao
 import id.yukelola.core.database.dao.DigitalTransactionComplaintDao
@@ -41,6 +42,7 @@ import id.yukelola.core.database.entity.CategoryEntity
 import id.yukelola.core.database.entity.CustomerDebtEntity
 import id.yukelola.core.database.entity.CustomerEntity
 import id.yukelola.core.database.entity.DebtPaymentEntity
+import id.yukelola.core.database.entity.DeviceEntity
 import id.yukelola.core.database.entity.DigitalDepositAccountEntity
 import id.yukelola.core.database.entity.DigitalDepositMutationEntity
 import id.yukelola.core.database.entity.DigitalTransactionComplaintEntity
@@ -91,7 +93,8 @@ import id.yukelola.core.database.entity.UserEntity
         DigitalTransactionComplaintEntity::class,
         StockAdjustmentEntity::class,
         CashierSessionEntity::class,
-        UserEntity::class
+        UserEntity::class,
+        DeviceEntity::class
     ],
     version = 1,
     exportSchema = true
@@ -126,4 +129,5 @@ abstract class YukelolaDatabase : RoomDatabase() {
     abstract fun stockAdjustmentDao(): StockAdjustmentDao
     abstract fun cashierSessionDao(): CashierSessionDao
     abstract fun userDao(): UserDao
+    abstract fun deviceDao(): DeviceDao
 }

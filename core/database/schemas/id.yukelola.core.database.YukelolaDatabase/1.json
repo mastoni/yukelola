@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "ac4c72fc6f5cbf74853e380714ab02f4",
+    "identityHash": "0d1e9b9eafedcf0af2e789b15d766c70",
     "entities": [
       {
         "tableName": "businesses",
@@ -4247,12 +4247,154 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "devices",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `business_id` TEXT NOT NULL, `branch_id` TEXT NOT NULL, `device_name` TEXT NOT NULL, `device_type` TEXT NOT NULL, `is_active` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`business_id`) REFERENCES `businesses`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`branch_id`) REFERENCES `branches`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "businessId",
+            "columnName": "business_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "branchId",
+            "columnName": "branch_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceName",
+            "columnName": "device_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceType",
+            "columnName": "device_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isActive",
+            "columnName": "is_active",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_devices_business_id",
+            "unique": false,
+            "columnNames": [
+              "business_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_devices_business_id` ON `${TABLE_NAME}` (`business_id`)"
+          },
+          {
+            "name": "index_devices_branch_id",
+            "unique": false,
+            "columnNames": [
+              "branch_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_devices_branch_id` ON `${TABLE_NAME}` (`branch_id`)"
+          },
+          {
+            "name": "index_devices_device_type",
+            "unique": false,
+            "columnNames": [
+              "device_type"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_devices_device_type` ON `${TABLE_NAME}` (`device_type`)"
+          },
+          {
+            "name": "index_devices_is_active",
+            "unique": false,
+            "columnNames": [
+              "is_active"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_devices_is_active` ON `${TABLE_NAME}` (`is_active`)"
+          },
+          {
+            "name": "index_devices_business_id_branch_id",
+            "unique": false,
+            "columnNames": [
+              "business_id",
+              "branch_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_devices_business_id_branch_id` ON `${TABLE_NAME}` (`business_id`, `branch_id`)"
+          },
+          {
+            "name": "index_devices_business_id_branch_id_device_type",
+            "unique": false,
+            "columnNames": [
+              "business_id",
+              "branch_id",
+              "device_type"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_devices_business_id_branch_id_device_type` ON `${TABLE_NAME}` (`business_id`, `branch_id`, `device_type`)"
+          },
+          {
+            "name": "index_devices_business_id_branch_id_is_active",
+            "unique": false,
+            "columnNames": [
+              "business_id",
+              "branch_id",
+              "is_active"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_devices_business_id_branch_id_is_active` ON `${TABLE_NAME}` (`business_id`, `branch_id`, `is_active`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "businesses",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "business_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "branches",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "branch_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'ac4c72fc6f5cbf74853e380714ab02f4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0d1e9b9eafedcf0af2e789b15d766c70')"
     ]
   }
 }
