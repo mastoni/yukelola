@@ -71,4 +71,20 @@ class YukelolaDatabaseTest {
         assertNotNull("Generated YukelolaDatabase_Impl must implement branchDao method", method)
         assertEquals(id.yukelola.core.database.dao.BranchDao::class.java, method!!.returnType)
     }
+
+    @Test
+    fun `YukelolaDatabase declares productDao getter`() {
+        val method = YukelolaDatabase::class.java.methods.firstOrNull { it.name == "productDao" }
+        assertNotNull("YukelolaDatabase must declare abstract productDao method", method)
+        assertEquals(0, method!!.parameterTypes.size)
+        assertEquals(id.yukelola.core.database.dao.ProductDao::class.java, method.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase_Impl implements productDao`() {
+        val implClass = Class.forName("id.yukelola.core.database.YukelolaDatabase_Impl")
+        val method = implClass.methods.firstOrNull { it.name == "productDao" }
+        assertNotNull("Generated YukelolaDatabase_Impl must implement productDao method", method)
+        assertEquals(id.yukelola.core.database.dao.ProductDao::class.java, method!!.returnType)
+    }
 }

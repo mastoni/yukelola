@@ -4,13 +4,16 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import id.yukelola.core.database.dao.BranchDao
 import id.yukelola.core.database.dao.BusinessDao
+import id.yukelola.core.database.dao.ProductDao
 import id.yukelola.core.database.entity.BranchEntity
 import id.yukelola.core.database.entity.BusinessEntity
+import id.yukelola.core.database.entity.ProductEntity
 
 @Database(
     entities = [
         BusinessEntity::class,
-        BranchEntity::class
+        BranchEntity::class,
+        ProductEntity::class
     ],
     version = 1,
     exportSchema = true
@@ -18,4 +21,5 @@ import id.yukelola.core.database.entity.BusinessEntity
 abstract class YukelolaDatabase : RoomDatabase() {
     abstract fun businessDao(): BusinessDao
     abstract fun branchDao(): BranchDao
+    abstract fun productDao(): ProductDao
 }
