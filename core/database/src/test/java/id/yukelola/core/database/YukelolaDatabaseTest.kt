@@ -39,4 +39,20 @@ class YukelolaDatabaseTest {
         assertEquals(1700000000000L, entity.createdAt)
         assertTrue(entity.isActive)
     }
+
+    @Test
+    fun `YukelolaDatabase declares businessDao getter`() {
+        val method = YukelolaDatabase::class.java.methods.firstOrNull { it.name == "businessDao" }
+        assertNotNull("YukelolaDatabase must declare abstract businessDao method", method)
+        assertEquals(0, method!!.parameterTypes.size)
+        assertEquals(id.yukelola.core.database.dao.BusinessDao::class.java, method.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase_Impl implements businessDao`() {
+        val implClass = Class.forName("id.yukelola.core.database.YukelolaDatabase_Impl")
+        val method = implClass.methods.firstOrNull { it.name == "businessDao" }
+        assertNotNull("Generated YukelolaDatabase_Impl must implement businessDao method", method)
+        assertEquals(id.yukelola.core.database.dao.BusinessDao::class.java, method!!.returnType)
+    }
 }
