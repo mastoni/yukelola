@@ -337,4 +337,36 @@ class YukelolaDatabaseTest {
         assertNotNull("Generated YukelolaDatabase_Impl must implement saleItemDao method", method)
         assertEquals(id.yukelola.core.database.dao.SaleItemDao::class.java, method!!.returnType)
     }
+
+    @Test
+    fun `YukelolaDatabase declares purchaseDao getter`() {
+        val method = YukelolaDatabase::class.java.methods.firstOrNull { it.name == "purchaseDao" }
+        assertNotNull("YukelolaDatabase must declare abstract purchaseDao method", method)
+        assertEquals(0, method!!.parameterTypes.size)
+        assertEquals(id.yukelola.core.database.dao.PurchaseDao::class.java, method.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase_Impl implements purchaseDao`() {
+        val implClass = Class.forName("id.yukelola.core.database.YukelolaDatabase_Impl")
+        val method = implClass.methods.firstOrNull { it.name == "purchaseDao" }
+        assertNotNull("Generated YukelolaDatabase_Impl must implement purchaseDao method", method)
+        assertEquals(id.yukelola.core.database.dao.PurchaseDao::class.java, method!!.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase declares purchaseItemDao getter`() {
+        val method = YukelolaDatabase::class.java.methods.firstOrNull { it.name == "purchaseItemDao" }
+        assertNotNull("YukelolaDatabase must declare abstract purchaseItemDao method", method)
+        assertEquals(0, method!!.parameterTypes.size)
+        assertEquals(id.yukelola.core.database.dao.PurchaseItemDao::class.java, method.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase_Impl implements purchaseItemDao`() {
+        val implClass = Class.forName("id.yukelola.core.database.YukelolaDatabase_Impl")
+        val method = implClass.methods.firstOrNull { it.name == "purchaseItemDao" }
+        assertNotNull("Generated YukelolaDatabase_Impl must implement purchaseItemDao method", method)
+        assertEquals(id.yukelola.core.database.dao.PurchaseItemDao::class.java, method!!.returnType)
+    }
 }

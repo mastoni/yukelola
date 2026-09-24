@@ -16,6 +16,8 @@ import id.yukelola.core.database.dao.DigitalDepositMutationDao
 import id.yukelola.core.database.dao.PaymentDao
 import id.yukelola.core.database.dao.ProductDao
 import id.yukelola.core.database.dao.ProductUnitDao
+import id.yukelola.core.database.dao.PurchaseDao
+import id.yukelola.core.database.dao.PurchaseItemDao
 import id.yukelola.core.database.dao.SaleDao
 import id.yukelola.core.database.dao.SaleItemDao
 import id.yukelola.core.database.dao.SupplierDao
@@ -34,6 +36,8 @@ import id.yukelola.core.database.entity.DigitalDepositMutationEntity
 import id.yukelola.core.database.entity.PaymentEntity
 import id.yukelola.core.database.entity.ProductEntity
 import id.yukelola.core.database.entity.ProductUnitEntity
+import id.yukelola.core.database.entity.PurchaseEntity
+import id.yukelola.core.database.entity.PurchaseItemEntity
 import id.yukelola.core.database.entity.SaleEntity
 import id.yukelola.core.database.entity.SaleItemEntity
 import id.yukelola.core.database.entity.SupplierDebtEntity
@@ -58,7 +62,9 @@ import id.yukelola.core.database.entity.SupplierEntity
         DigitalDepositMutationEntity::class,
         PaymentEntity::class,
         SaleEntity::class,
-        SaleItemEntity::class
+        SaleItemEntity::class,
+        PurchaseEntity::class,
+        PurchaseItemEntity::class
     ],
     version = 1,
     exportSchema = true
@@ -82,4 +88,6 @@ abstract class YukelolaDatabase : RoomDatabase() {
     abstract fun paymentDao(): PaymentDao
     abstract fun saleDao(): SaleDao
     abstract fun saleItemDao(): SaleItemDao
+    abstract fun purchaseDao(): PurchaseDao
+    abstract fun purchaseItemDao(): PurchaseItemDao
 }
