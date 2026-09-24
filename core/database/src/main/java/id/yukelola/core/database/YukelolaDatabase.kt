@@ -6,12 +6,14 @@ import id.yukelola.core.database.dao.BranchDao
 import id.yukelola.core.database.dao.BranchProductOverrideDao
 import id.yukelola.core.database.dao.BusinessDao
 import id.yukelola.core.database.dao.CategoryDao
+import id.yukelola.core.database.dao.CustomerDao
 import id.yukelola.core.database.dao.ProductDao
 import id.yukelola.core.database.dao.ProductUnitDao
 import id.yukelola.core.database.entity.BranchEntity
 import id.yukelola.core.database.entity.BranchProductOverrideEntity
 import id.yukelola.core.database.entity.BusinessEntity
 import id.yukelola.core.database.entity.CategoryEntity
+import id.yukelola.core.database.entity.CustomerEntity
 import id.yukelola.core.database.entity.ProductEntity
 import id.yukelola.core.database.entity.ProductUnitEntity
 
@@ -22,7 +24,8 @@ import id.yukelola.core.database.entity.ProductUnitEntity
         ProductEntity::class,
         BranchProductOverrideEntity::class,
         CategoryEntity::class,
-        ProductUnitEntity::class
+        ProductUnitEntity::class,
+        CustomerEntity::class
     ],
     version = 1,
     exportSchema = true
@@ -34,4 +37,5 @@ abstract class YukelolaDatabase : RoomDatabase() {
     abstract fun branchProductOverrideDao(): BranchProductOverrideDao
     abstract fun categoryDao(): CategoryDao
     abstract fun productUnitDao(): ProductUnitDao
+    abstract fun customerDao(): CustomerDao
 }
