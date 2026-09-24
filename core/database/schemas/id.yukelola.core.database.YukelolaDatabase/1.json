@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "01395c9745cc8f133954f3c9f7e8bb57",
+    "identityHash": "2b1f2c6fc1f50c30f13dfeafd15a7702",
     "entities": [
       {
         "tableName": "businesses",
@@ -3936,12 +3936,168 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "cashier_sessions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `branch_id` TEXT NOT NULL, `user_id` TEXT NOT NULL, `device_id` TEXT NOT NULL, `opening_balance` INTEGER NOT NULL, `closing_balance` INTEGER, `opened_at` INTEGER NOT NULL, `closed_at` INTEGER, `status` TEXT NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`branch_id`) REFERENCES `branches`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "branchId",
+            "columnName": "branch_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "user_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceId",
+            "columnName": "device_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "openingBalance",
+            "columnName": "opening_balance",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "closingBalance",
+            "columnName": "closing_balance",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "openedAt",
+            "columnName": "opened_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "closedAt",
+            "columnName": "closed_at",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "status",
+            "columnName": "status",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_cashier_sessions_branch_id",
+            "unique": false,
+            "columnNames": [
+              "branch_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cashier_sessions_branch_id` ON `${TABLE_NAME}` (`branch_id`)"
+          },
+          {
+            "name": "index_cashier_sessions_user_id",
+            "unique": false,
+            "columnNames": [
+              "user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cashier_sessions_user_id` ON `${TABLE_NAME}` (`user_id`)"
+          },
+          {
+            "name": "index_cashier_sessions_device_id",
+            "unique": false,
+            "columnNames": [
+              "device_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cashier_sessions_device_id` ON `${TABLE_NAME}` (`device_id`)"
+          },
+          {
+            "name": "index_cashier_sessions_status",
+            "unique": false,
+            "columnNames": [
+              "status"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cashier_sessions_status` ON `${TABLE_NAME}` (`status`)"
+          },
+          {
+            "name": "index_cashier_sessions_opened_at",
+            "unique": false,
+            "columnNames": [
+              "opened_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cashier_sessions_opened_at` ON `${TABLE_NAME}` (`opened_at`)"
+          },
+          {
+            "name": "index_cashier_sessions_branch_id_status",
+            "unique": false,
+            "columnNames": [
+              "branch_id",
+              "status"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cashier_sessions_branch_id_status` ON `${TABLE_NAME}` (`branch_id`, `status`)"
+          },
+          {
+            "name": "index_cashier_sessions_branch_id_user_id",
+            "unique": false,
+            "columnNames": [
+              "branch_id",
+              "user_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cashier_sessions_branch_id_user_id` ON `${TABLE_NAME}` (`branch_id`, `user_id`)"
+          },
+          {
+            "name": "index_cashier_sessions_branch_id_device_id",
+            "unique": false,
+            "columnNames": [
+              "branch_id",
+              "device_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_cashier_sessions_branch_id_device_id` ON `${TABLE_NAME}` (`branch_id`, `device_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "branches",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "branch_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '01395c9745cc8f133954f3c9f7e8bb57')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '2b1f2c6fc1f50c30f13dfeafd15a7702')"
     ]
   }
 }
