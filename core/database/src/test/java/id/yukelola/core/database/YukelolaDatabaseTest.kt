@@ -273,4 +273,20 @@ class YukelolaDatabaseTest {
         assertNotNull("Generated YukelolaDatabase_Impl must implement digitalDepositAccountDao method", method)
         assertEquals(id.yukelola.core.database.dao.DigitalDepositAccountDao::class.java, method!!.returnType)
     }
+
+    @Test
+    fun `YukelolaDatabase declares digitalDepositMutationDao getter`() {
+        val method = YukelolaDatabase::class.java.methods.firstOrNull { it.name == "digitalDepositMutationDao" }
+        assertNotNull("YukelolaDatabase must declare abstract digitalDepositMutationDao method", method)
+        assertEquals(0, method!!.parameterTypes.size)
+        assertEquals(id.yukelola.core.database.dao.DigitalDepositMutationDao::class.java, method.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase_Impl implements digitalDepositMutationDao`() {
+        val implClass = Class.forName("id.yukelola.core.database.YukelolaDatabase_Impl")
+        val method = implClass.methods.firstOrNull { it.name == "digitalDepositMutationDao" }
+        assertNotNull("Generated YukelolaDatabase_Impl must implement digitalDepositMutationDao method", method)
+        assertEquals(id.yukelola.core.database.dao.DigitalDepositMutationDao::class.java, method!!.returnType)
+    }
 }

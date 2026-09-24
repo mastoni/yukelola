@@ -12,6 +12,7 @@ import id.yukelola.core.database.dao.CustomerDao
 import id.yukelola.core.database.dao.CustomerDebtDao
 import id.yukelola.core.database.dao.DebtPaymentDao
 import id.yukelola.core.database.dao.DigitalDepositAccountDao
+import id.yukelola.core.database.dao.DigitalDepositMutationDao
 import id.yukelola.core.database.dao.ProductDao
 import id.yukelola.core.database.dao.ProductUnitDao
 import id.yukelola.core.database.dao.SupplierDao
@@ -26,6 +27,7 @@ import id.yukelola.core.database.entity.CustomerDebtEntity
 import id.yukelola.core.database.entity.CustomerEntity
 import id.yukelola.core.database.entity.DebtPaymentEntity
 import id.yukelola.core.database.entity.DigitalDepositAccountEntity
+import id.yukelola.core.database.entity.DigitalDepositMutationEntity
 import id.yukelola.core.database.entity.ProductEntity
 import id.yukelola.core.database.entity.ProductUnitEntity
 import id.yukelola.core.database.entity.SupplierDebtEntity
@@ -46,7 +48,8 @@ import id.yukelola.core.database.entity.SupplierEntity
         DebtPaymentEntity::class,
         CashRegisterEntity::class,
         CashMutationEntity::class,
-        DigitalDepositAccountEntity::class
+        DigitalDepositAccountEntity::class,
+        DigitalDepositMutationEntity::class
     ],
     version = 1,
     exportSchema = true
@@ -66,4 +69,5 @@ abstract class YukelolaDatabase : RoomDatabase() {
     abstract fun cashRegisterDao(): CashRegisterDao
     abstract fun cashMutationDao(): CashMutationDao
     abstract fun digitalDepositAccountDao(): DigitalDepositAccountDao
+    abstract fun digitalDepositMutationDao(): DigitalDepositMutationDao
 }
