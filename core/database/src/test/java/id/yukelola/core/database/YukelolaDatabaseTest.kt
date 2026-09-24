@@ -113,4 +113,20 @@ class YukelolaDatabaseTest {
             method!!.returnType
         )
     }
+
+    @Test
+    fun `YukelolaDatabase declares categoryDao getter`() {
+        val method = YukelolaDatabase::class.java.methods.firstOrNull { it.name == "categoryDao" }
+        assertNotNull("YukelolaDatabase must declare abstract categoryDao method", method)
+        assertEquals(0, method!!.parameterTypes.size)
+        assertEquals(id.yukelola.core.database.dao.CategoryDao::class.java, method.returnType)
+    }
+
+    @Test
+    fun `YukelolaDatabase_Impl implements categoryDao`() {
+        val implClass = Class.forName("id.yukelola.core.database.YukelolaDatabase_Impl")
+        val method = implClass.methods.firstOrNull { it.name == "categoryDao" }
+        assertNotNull("Generated YukelolaDatabase_Impl must implement categoryDao method", method)
+        assertEquals(id.yukelola.core.database.dao.CategoryDao::class.java, method!!.returnType)
+    }
 }
