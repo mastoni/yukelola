@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "20fa8dd897be2e0fad2e5e2d361a5485",
+    "identityHash": "0b27c483ff6f8c1562108f57adf5b018",
     "entities": [
       {
         "tableName": "businesses",
@@ -3075,12 +3075,251 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "digital_transactions",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `business_id` TEXT NOT NULL, `branch_id` TEXT NOT NULL, `user_id` TEXT NOT NULL, `device_id` TEXT NOT NULL, `cashier_session_id` TEXT, `target_number` TEXT NOT NULL, `product_code` TEXT NOT NULL, `denomination` INTEGER NOT NULL, `cost_price` INTEGER NOT NULL, `selling_price` INTEGER NOT NULL, `sale_id` TEXT, `deposit_mutation_id` TEXT, `fulfillment_status` TEXT NOT NULL, `provider_reference` TEXT, `failure_reason` TEXT, `created_at` INTEGER NOT NULL, `updated_at` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`business_id`) REFERENCES `businesses`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`branch_id`) REFERENCES `branches`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "businessId",
+            "columnName": "business_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "branchId",
+            "columnName": "branch_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "user_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceId",
+            "columnName": "device_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "cashierSessionId",
+            "columnName": "cashier_session_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "targetNumber",
+            "columnName": "target_number",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productCode",
+            "columnName": "product_code",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "denomination",
+            "columnName": "denomination",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "costPrice",
+            "columnName": "cost_price",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sellingPrice",
+            "columnName": "selling_price",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "saleId",
+            "columnName": "sale_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "depositMutationId",
+            "columnName": "deposit_mutation_id",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "fulfillmentStatus",
+            "columnName": "fulfillment_status",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "providerReference",
+            "columnName": "provider_reference",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "failureReason",
+            "columnName": "failure_reason",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedAt",
+            "columnName": "updated_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_digital_transactions_business_id",
+            "unique": false,
+            "columnNames": [
+              "business_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_digital_transactions_business_id` ON `${TABLE_NAME}` (`business_id`)"
+          },
+          {
+            "name": "index_digital_transactions_branch_id",
+            "unique": false,
+            "columnNames": [
+              "branch_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_digital_transactions_branch_id` ON `${TABLE_NAME}` (`branch_id`)"
+          },
+          {
+            "name": "index_digital_transactions_fulfillment_status",
+            "unique": false,
+            "columnNames": [
+              "fulfillment_status"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_digital_transactions_fulfillment_status` ON `${TABLE_NAME}` (`fulfillment_status`)"
+          },
+          {
+            "name": "index_digital_transactions_product_code",
+            "unique": false,
+            "columnNames": [
+              "product_code"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_digital_transactions_product_code` ON `${TABLE_NAME}` (`product_code`)"
+          },
+          {
+            "name": "index_digital_transactions_target_number",
+            "unique": false,
+            "columnNames": [
+              "target_number"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_digital_transactions_target_number` ON `${TABLE_NAME}` (`target_number`)"
+          },
+          {
+            "name": "index_digital_transactions_sale_id",
+            "unique": false,
+            "columnNames": [
+              "sale_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_digital_transactions_sale_id` ON `${TABLE_NAME}` (`sale_id`)"
+          },
+          {
+            "name": "index_digital_transactions_deposit_mutation_id",
+            "unique": false,
+            "columnNames": [
+              "deposit_mutation_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_digital_transactions_deposit_mutation_id` ON `${TABLE_NAME}` (`deposit_mutation_id`)"
+          },
+          {
+            "name": "index_digital_transactions_provider_reference",
+            "unique": false,
+            "columnNames": [
+              "provider_reference"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_digital_transactions_provider_reference` ON `${TABLE_NAME}` (`provider_reference`)"
+          },
+          {
+            "name": "index_digital_transactions_business_id_branch_id",
+            "unique": false,
+            "columnNames": [
+              "business_id",
+              "branch_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_digital_transactions_business_id_branch_id` ON `${TABLE_NAME}` (`business_id`, `branch_id`)"
+          },
+          {
+            "name": "index_digital_transactions_business_id_branch_id_fulfillment_status",
+            "unique": false,
+            "columnNames": [
+              "business_id",
+              "branch_id",
+              "fulfillment_status"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_digital_transactions_business_id_branch_id_fulfillment_status` ON `${TABLE_NAME}` (`business_id`, `branch_id`, `fulfillment_status`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "businesses",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "business_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "branches",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "branch_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '20fa8dd897be2e0fad2e5e2d361a5485')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0b27c483ff6f8c1562108f57adf5b018')"
     ]
   }
 }
