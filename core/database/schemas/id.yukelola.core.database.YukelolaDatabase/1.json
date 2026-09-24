@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1d0feaebf0b9e6a7ba4c0f36584ae6a9",
+    "identityHash": "01395c9745cc8f133954f3c9f7e8bb57",
     "entities": [
       {
         "tableName": "businesses",
@@ -3744,12 +3744,204 @@
             ]
           }
         ]
+      },
+      {
+        "tableName": "stock_adjustments",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` TEXT NOT NULL, `business_id` TEXT NOT NULL, `branch_id` TEXT NOT NULL, `product_id` TEXT NOT NULL, `previous_stock` REAL NOT NULL, `adjusted_stock` REAL NOT NULL, `reason` TEXT NOT NULL, `user_id` TEXT NOT NULL, `device_id` TEXT NOT NULL, `notes` TEXT, `created_at` INTEGER NOT NULL, PRIMARY KEY(`id`), FOREIGN KEY(`business_id`) REFERENCES `businesses`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`branch_id`) REFERENCES `branches`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`product_id`) REFERENCES `products`(`id`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "businessId",
+            "columnName": "business_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "branchId",
+            "columnName": "branch_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "productId",
+            "columnName": "product_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "previousStock",
+            "columnName": "previous_stock",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "adjustedStock",
+            "columnName": "adjusted_stock",
+            "affinity": "REAL",
+            "notNull": true
+          },
+          {
+            "fieldPath": "reason",
+            "columnName": "reason",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "userId",
+            "columnName": "user_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "deviceId",
+            "columnName": "device_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "notes",
+            "columnName": "notes",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_stock_adjustments_business_id",
+            "unique": false,
+            "columnNames": [
+              "business_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_adjustments_business_id` ON `${TABLE_NAME}` (`business_id`)"
+          },
+          {
+            "name": "index_stock_adjustments_branch_id",
+            "unique": false,
+            "columnNames": [
+              "branch_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_adjustments_branch_id` ON `${TABLE_NAME}` (`branch_id`)"
+          },
+          {
+            "name": "index_stock_adjustments_product_id",
+            "unique": false,
+            "columnNames": [
+              "product_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_adjustments_product_id` ON `${TABLE_NAME}` (`product_id`)"
+          },
+          {
+            "name": "index_stock_adjustments_reason",
+            "unique": false,
+            "columnNames": [
+              "reason"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_adjustments_reason` ON `${TABLE_NAME}` (`reason`)"
+          },
+          {
+            "name": "index_stock_adjustments_created_at",
+            "unique": false,
+            "columnNames": [
+              "created_at"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_adjustments_created_at` ON `${TABLE_NAME}` (`created_at`)"
+          },
+          {
+            "name": "index_stock_adjustments_business_id_branch_id",
+            "unique": false,
+            "columnNames": [
+              "business_id",
+              "branch_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_adjustments_business_id_branch_id` ON `${TABLE_NAME}` (`business_id`, `branch_id`)"
+          },
+          {
+            "name": "index_stock_adjustments_business_id_branch_id_product_id",
+            "unique": false,
+            "columnNames": [
+              "business_id",
+              "branch_id",
+              "product_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_adjustments_business_id_branch_id_product_id` ON `${TABLE_NAME}` (`business_id`, `branch_id`, `product_id`)"
+          },
+          {
+            "name": "index_stock_adjustments_business_id_branch_id_reason",
+            "unique": false,
+            "columnNames": [
+              "business_id",
+              "branch_id",
+              "reason"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_stock_adjustments_business_id_branch_id_reason` ON `${TABLE_NAME}` (`business_id`, `branch_id`, `reason`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "businesses",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "business_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "branches",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "branch_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "products",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "product_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1d0feaebf0b9e6a7ba4c0f36584ae6a9')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '01395c9745cc8f133954f3c9f7e8bb57')"
     ]
   }
 }

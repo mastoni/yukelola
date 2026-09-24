@@ -26,6 +26,7 @@ import id.yukelola.core.database.dao.SaleDao
 import id.yukelola.core.database.dao.SaleItemDao
 import id.yukelola.core.database.dao.ServiceOrderDao
 import id.yukelola.core.database.dao.ServiceOrderItemDao
+import id.yukelola.core.database.dao.StockAdjustmentDao
 import id.yukelola.core.database.dao.SupplierDao
 import id.yukelola.core.database.dao.SupplierDebtDao
 import id.yukelola.core.database.entity.BranchEntity
@@ -52,6 +53,7 @@ import id.yukelola.core.database.entity.SaleEntity
 import id.yukelola.core.database.entity.SaleItemEntity
 import id.yukelola.core.database.entity.ServiceOrderEntity
 import id.yukelola.core.database.entity.ServiceOrderItemEntity
+import id.yukelola.core.database.entity.StockAdjustmentEntity
 import id.yukelola.core.database.entity.SupplierDebtEntity
 import id.yukelola.core.database.entity.SupplierEntity
 
@@ -82,7 +84,8 @@ import id.yukelola.core.database.entity.SupplierEntity
         DownPaymentRecordEntity::class,
         DigitalTransactionEntity::class,
         InquiryEntity::class,
-        DigitalTransactionComplaintEntity::class
+        DigitalTransactionComplaintEntity::class,
+        StockAdjustmentEntity::class
     ],
     version = 1,
     exportSchema = true
@@ -114,4 +117,5 @@ abstract class YukelolaDatabase : RoomDatabase() {
     abstract fun serviceOrderDao(): ServiceOrderDao
     abstract fun serviceOrderItemDao(): ServiceOrderItemDao
     abstract fun downPaymentRecordDao(): DownPaymentRecordDao
+    abstract fun stockAdjustmentDao(): StockAdjustmentDao
 }
